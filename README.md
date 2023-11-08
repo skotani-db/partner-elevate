@@ -29,8 +29,8 @@ Databricks Academyでは、従来から2番目の方法で配布していまし�
    
    ![](https://github.com/skotani-db/data-engineering-with-databricks/blob/753dc9d03532fc8cee87081310bef6824552d135/images/copy-url.png)
 
-1. Databricksで、 左のペインにある **Repos** アイコン![](https://github.com/shotaroktn-db/data-engineering-with-databricks/blob/main/images/repos-icon.png)をクリック
-1. デフォルトで */Repos/* 配下にあるユーザー個別のフォルダへ移動します
+1. Databricksで、 左のペインにある **Workspace** アイコン![](https://github.com/shotaroktn-db/data-engineering-with-databricks/blob/main/images/repos-icon.png)をクリック
+1.  */Repos/* 配下にあるユーザー個別のフォルダへ移動します。ユーザーフォルダが存在しなければ次のステップにそのまま遷移します。
 1.  **Add Repo** ボタンをクリックします<br/>
 ![](https://github.com/skotani-db/data-engineering-with-databricks/blob/753dc9d03532fc8cee87081310bef6824552d135/images/add-repo.png)
 1. 
