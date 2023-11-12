@@ -9,38 +9,39 @@
 
 -- DBTITLE 0,--i18n-ff0a44e1-46a3-4191-b583-5c657053b1af
 -- MAGIC %md
--- MAGIC # More DLT SQL Syntax
+-- MAGIC # DLT SQL構文のさらなる理解
 -- MAGIC
--- MAGIC DLT Pipelines make it easy to combine multiple datasets into a single scalable workload using one or many notebooks.
+-- MAGIC DLTパイプラインを使用すると、1つまたは複数のノートブックを使用して、複数のデータセットを単一のスケーラブルなワークロードに組み合わせることが簡単になります。
 -- MAGIC
--- MAGIC In the last notebook, we reviewed some of the basic functionality of DLT syntax while processing data from cloud object storage through a series of queries to validate and enrich records at each step. This notebook similarly follows the medallion architecture, but introduces a number of new concepts.
--- MAGIC * Raw records represent change data capture (CDC) information about customers 
--- MAGIC * The bronze table again uses Auto Loader to ingest JSON data from cloud object storage
--- MAGIC * A table is defined to enforce constraints before passing records to the silver layer
--- MAGIC * **`APPLY CHANGES INTO`** is used to automatically process CDC data into the silver layer as a Type 1 <a href="https://en.wikipedia.org/wiki/Slowly_changing_dimension" target="_blank">slowly changing dimension (SCD) table<a/>
--- MAGIC * A gold table is defined to calculate an aggregate from the current version of this Type 1 table
--- MAGIC * A view is defined that joins with tables defined in another notebook
+-- MAGIC 前回のノートブックでは、クラウドオブジェクトストレージからのJSONデータの取り込みを含む一連のクエリを使用して、DLT構文の基本的な機能のいくつかを確認しました。このノートブックも同様にメダリオンアーキテクチャに従っており、いくつかの新しい概念を紹介しています。
+-- MAGIC * 生のレコードは、顧客に関する変更データの取り込み（CDC）情報を表します
+-- MAGIC * ブロンズテーブルは、再びAuto Loaderを使用してクラウドオブジェクトストレージからJSONデータを取り込みます
+-- MAGIC * 制約を強制するためのテーブルが定義され、レコードがシルバーレイヤに渡される前に制約が適用されます
+-- MAGIC * **`APPLY CHANGES INTO`** を使用してCDCデータを自動的にシルバーレイヤに処理し、Type 1 <a href="https://en.wikipedia.org/wiki/Slowly_changing_dimension" target="_blank">スローリーチェンジングディメンション（SCD）テーブル</a>にします
+-- MAGIC * ゴールドテーブルが定義され、このType 1テーブルの現在のバージョンから集計を計算します
+-- MAGIC * 別のノートブックで定義されたテーブルと結合するビューが定義されています
 -- MAGIC
--- MAGIC ## Learning Objectives
+-- MAGIC ## 学習目標
 -- MAGIC
--- MAGIC By the end of this lesson, students should feel comfortable:
--- MAGIC * Processing CDC data with **`APPLY CHANGES INTO`**
--- MAGIC * Declaring live views
--- MAGIC * Joining live tables
--- MAGIC * Describing how DLT library notebooks work together in a pipeline
--- MAGIC * Scheduling multiple notebooks in a DLT pipeline
+-- MAGIC このレッスンの最後までに、学生は次のことに慣れているはずです。
+-- MAGIC * **`APPLY CHANGES INTO`** を使用してCDCデータを処理する
+-- MAGIC * ライブビューの宣言
+-- MAGIC * ライブテーブルの結合
+-- MAGIC * DLTライブラリノートブックがパイプラインで協力する方法の説明
+-- MAGIC * DLTパイプラインで複数のノートブックをスケジュールする
+-- MAGIC
 
 -- COMMAND ----------
 
 -- DBTITLE 0,--i18n-959211b8-33e7-498b-8da9-771fdfb0978b
 -- MAGIC %md
--- MAGIC ## Ingest Data with Auto Loader
+-- MAGIC ## Auto Loaderを使用してデータを取り込む
 -- MAGIC
--- MAGIC As in the last notebook, we define a bronze table against a data source configured with Auto Loader.
+-- MAGIC 前回のノートブックと同様に、Auto Loaderで構成されたデータソースに対してブロンズテーブルを定義します。
 -- MAGIC
--- MAGIC Note that the code below omits the Auto Loader option to infer schema. When data is ingested from JSON without the schema provided or inferred, fields will have the correct names but will all be stored as **`STRING`** type.
+-- MAGIC 以下のコードでは、スキーマを推論せずにJSONからデータを取り込むためのAuto Loaderオプションが省略されています。スキーマが提供されず、または推論されない場合、フィールドは正しい名前でありながらすべて**`STRING`**型として保存されます。
 -- MAGIC
--- MAGIC The code below also provides a simple comment and adds fields for time of data ingestion and the file name for each record.
+-- MAGIC 以下のコードでは、シンプルなコメントが提供され、データ取り込みのタイミングと各レコードのファイル名が追加されています。
 
 -- COMMAND ----------
 
@@ -53,34 +54,36 @@ FROM cloud_files("${source}/customers", "json")
 
 -- DBTITLE 0,--i18n-43d96582-8a29-49d0-b57f-0038334f6b88
 -- MAGIC %md
--- MAGIC ## Quality Enforcement Continued
 -- MAGIC
--- MAGIC The query below demonstrates:
--- MAGIC * The 3 options for behavior when constraints are violated
--- MAGIC * A query with multiple constraints
--- MAGIC * Multiple conditions provided to one constraint
--- MAGIC * Using a built-in SQL function in a constraint
+-- MAGIC ## データ品質の強化の続き
 -- MAGIC
--- MAGIC About the data source:
--- MAGIC * Data is a CDC feed that contains **`INSERT`**, **`UPDATE`**, and **`DELETE`** operations. 
--- MAGIC * Update and insert operations should contain valid entries for all fields.
--- MAGIC * Delete operations should contain **`NULL`** values for all fields other than the timestamp, **`customer_id`**, and operation fields.
+-- MAGIC 以下のクエリでは、以下のポイントが示されています。
+-- MAGIC - 制約が違反した場合の3つの動作オプション
+-- MAGIC - 複数の制約を持つクエリ
+-- MAGIC - 同じ制約に複数の条件を提供
+-- MAGIC - 制約内で組み込みのSQL関数を使用
 -- MAGIC
--- MAGIC In order to ensure only good data makes it into our silver table, we'll write a series of quality enforcement rules that ignore the expected null values in delete operations.
+-- MAGIC データソースについて：
+-- MAGIC - データは **`INSERT`**、**`UPDATE`**、**`DELETE`** 操作を含むCDCフィードです。
+-- MAGIC - 更新と挿入の操作はすべてのフィールドに有効なエントリを含む必要があります。
+-- MAGIC - 削除操作は、タイムスタンプ、 **`customer_id`** 、および操作フィールド以外のすべてのフィールドに **`NULL`** 値を含める必要があります。
 -- MAGIC
--- MAGIC We'll break down each of these constraints below:
+-- MAGIC 私たちのシルバーテーブルに良質なデータだけが入るようにするために、削除操作の予想される **`NULL`** 値を無視する品質強化ルールの一連を作成します。
 -- MAGIC
--- MAGIC ##### **`valid_id`**
--- MAGIC This constraint will cause our transaction to fail if a record contains a null value in the **`customer_id`** field.
+-- MAGIC 以下では、これらの各制約を詳細に説明します。
 -- MAGIC
--- MAGIC ##### **`valid_operation`**
--- MAGIC This contraint will drop any records that contain a null value in the **`operation`** field.
+-- MAGIC **`valid_id`**
+-- MAGIC この制約は、 **`customer_id`** フィールドに **`NULL`** 値が含まれている場合、トランザクションを失敗させます。
 -- MAGIC
--- MAGIC ##### **`valid_address`**
--- MAGIC This constraint checks if the **`operation`** field is **`DELETE`**; if not, it checks for null values in any of the 4 fields comprising an address. Because there is no additional instruction for what to do with invalid records, violating rows will be recorded in metrics but not dropped.
+-- MAGIC **`valid_operation`**
+-- MAGIC この制約は、 **`operation`** フィールドに **`NULL`** 値が含まれているレコードを削除します。
 -- MAGIC
--- MAGIC ##### **`valid_email`**
--- MAGIC This constraint uses regex pattern matching to check that the value in the **`email`** field is a valid email address. It contains logic to not apply this to records if the **`operation`** field is **`DELETE`** (because these will have a null value for the **`email`** field). Violating records are dropped.
+-- MAGIC **`valid_address`**
+-- MAGIC この制約は、 **`operation`** フィールドが **`DELETE`** でない場合、住所を構成する4つのフィールドのいずれかに **`NULL`** 値が含まれているかどうかを確認します。制約内の無効なレコードに対する追加の指示がないため、違反した行はメトリクスに記録されますが、削除されません。
+-- MAGIC
+-- MAGIC **`valid_email`**
+-- MAGIC この制約は、 **`email`** フィールドの値が有効なメールアドレスであるかどうかを確認するために正規表現のパターンマッチングを使用します。 **`operation`** フィールドが **`DELETE`** である場合はこれを適用しないようにロジックが組まれています（なぜならこれらは **`email`** フィールドに **`NULL`** 値を持つことになるからです）。違反したレコードは削除されます。
+-- MAGIC
 
 -- COMMAND ----------
 
@@ -104,27 +107,25 @@ AS SELECT *
 
 -- DBTITLE 0,--i18n-5766064f-1619-4468-ac05-2176451e11c0
 -- MAGIC %md
--- MAGIC ## Processing CDC Data with **`APPLY CHANGES INTO`**
+-- MAGIC 上記のクエリでは、CDCデータを処理するための新しい構文構造である **`APPLY CHANGES INTO`** が紹介されています。
 -- MAGIC
--- MAGIC DLT introduces a new syntactic structure for simplifying CDC feed processing.
+-- MAGIC **`APPLY CHANGES INTO`** は、以下の保証と要件があります。
+-- MAGIC * CDCデータの増分/ストリーミング取り込みを実行します。
+-- MAGIC * 1つまたは複数のフィールドをテーブルの主キーとして指定するためのシンプルな構文を提供します。
+-- MAGIC * デフォルトの仮定は、行には挿入と更新が含まれているということです。
+-- MAGIC * オプションで削除を適用できます。
+-- MAGIC * ユーザーが提供したシーケンスキーを使用して、遅延して到着するレコードを自動的に並べ替えます。
+-- MAGIC * **`EXCEPT`** キーワードを使用して無視する列を指定するためのシンプルな構文を使用します。
+-- MAGIC * 変更をType 1 SCDとして適用するというデフォルトがあります。
 -- MAGIC
--- MAGIC **`APPLY CHANGES INTO`** has the following guarantees and requirements:
--- MAGIC * Performs incremental/streaming ingestion of CDC data
--- MAGIC * Provides simple syntax to specify one or many fields as the primary key for a table
--- MAGIC * Default assumption is that rows will contain inserts and updates
--- MAGIC * Can optionally apply deletes
--- MAGIC * Automatically orders late-arriving records using user-provided sequencing key
--- MAGIC * Uses a simple syntax for specifying columns to ignore with the **`EXCEPT`** keyword
--- MAGIC * Will default to applying changes as Type 1 SCD
--- MAGIC
--- MAGIC The code below:
--- MAGIC * Creates the **`customers_silver`** table; **`APPLY CHANGES INTO`** requires the target table to be declared in a separate statement
--- MAGIC * Identifies the **`customers_silver`** table as the target into which the changes will be applied
--- MAGIC * Specifies the table **`customers_bronze_clean`** as the streaming source
--- MAGIC * Identifies the **`customer_id`** as the primary key
--- MAGIC * Specifies that records where the **`operation`** field is **`DELETE`** should be applied as deletes
--- MAGIC * Specifies the **`timestamp`** field for ordering how operations should be applied
--- MAGIC * Indicates that all fields should be added to the target table except **`operation`**, **`source_file`**, and **`_rescued_data`**
+-- MAGIC 上記のコードは、次のことを行っています。
+-- MAGIC * **`customers_silver`** テーブルを作成します。 **`APPLY CHANGES INTO`** は、変更が適用される対象のテーブルを別のステートメントで宣言する必要があります。
+-- MAGIC * **`customers_silver`** テーブルを変更が適用される対象として識別します。
+-- MAGIC * ストリーミングソースとして **`customers_bronze_clean`** テーブルを指定します。
+-- MAGIC * **`customer_id`** を主キーとして指定します。
+-- MAGIC * **`operation`** フィールドが **`DELETE`** の場合は削除として適用されるレコードを指定します。
+-- MAGIC * オペレーションが適用される方法を指定するために **`timestamp`** フィールドを指定します。
+-- MAGIC * **`operation`** 、 **`source_file`** 、および **`_rescued_data`** 以外のすべてのフィールドを対象テーブルに追加するように指定します。
 
 -- COMMAND ----------
 
@@ -141,15 +142,15 @@ APPLY CHANGES INTO LIVE.customers_silver
 
 -- DBTITLE 0,--i18n-5956effc-3fb5-4473-b2e7-297e5a3e1103
 -- MAGIC %md
--- MAGIC ## Querying Tables with Applied Changes
 -- MAGIC
--- MAGIC **`APPLY CHANGES INTO`** defaults to creating a Type 1 SCD table, meaning that each unique key will have at most 1 record and that updates will overwrite the original information.
+-- MAGIC **`APPLY CHANGES INTO`** は、デフォルトでType 1 SCDテーブルを作成するようになっており、つまり、各ユニークキーには最大1つのレコードしかなく、更新は元の情報を上書きします。
 -- MAGIC
--- MAGIC While the target of our operation in the previous cell was defined as a streaming live table, data is being updated and deleted in this table (and so breaks the append-only requirements for streaming live table sources). As such, downstream operations cannot perform streaming queries against this table. 
+-- MAGIC 前のセルでの操作の対象がストリーミングライブテーブルとして定義されていましたが、このテーブルではデータが更新および削除されています（したがって、ストリーミングライブテーブルソースの追加専用要件が壊れています）。 したがって、ダウンストリームの操作はこのテーブルに対してストリーミングクエリを実行することはできません。
 -- MAGIC
--- MAGIC This pattern ensures that if any updates arrive out of order, downstream results can be properly recomputed to reflect updates. It also ensures that when records are deleted from a source table, these values are no longer reflected in tables later in the pipeline.
+-- MAGIC このパターンにより、更新が順番外れで到着した場合、ダウンストリームの結果を正しく再計算して更新を反映できるようになります。 また、ソーステーブルからレコードが削除された場合、これらの値はパイプライン内の後のテーブルにはもはや反映されないようになります。
 -- MAGIC
--- MAGIC Below, we define a simple aggregate query to create a live table from the data in the **`customers_silver`** table.
+-- MAGIC 以下では、 **`customers_silver`** テーブルのデータからライブテーブルを作成するための簡単な集計クエリを定義しています。
+-- MAGIC
 
 -- COMMAND ----------
 
@@ -163,29 +164,29 @@ AS SELECT state, count(*) as customer_count, current_timestamp() updated_at
 
 -- DBTITLE 0,--i18n-cd430cf6-927e-4a2e-a68d-ba87b9fdf3f6
 -- MAGIC %md
--- MAGIC ## DLT Views
 -- MAGIC
--- MAGIC The query below defines a DLT view by replacing **`TABLE`** with the **`VIEW`** keyword.
+-- MAGIC 以下のクエリでは、 **`VIEW`** キーワードで **`TABLE`** を置き換えることで、DLTビューを定義しています。
 -- MAGIC
--- MAGIC Views in DLT differ from persisted tables, and can optionally be defined as **`STREAMING`**.
+-- MAGIC DLTのビューは永続テーブルとは異なり、オプションで **`STREAMING`** として定義することができます。
 -- MAGIC
--- MAGIC Views have the same update guarantees as live tables, but the results of queries are not stored to disk.
+-- MAGIC ビューはライブテーブルと同じ更新の保証を持っていますが、クエリの結果はディスクに保存されません。
 -- MAGIC
--- MAGIC Unlike views used elsewhere in Databricks, DLT views are not persisted to the metastore, meaning that they can only be referenced from within the DLT pipeline they are a part of. (This is similar scoping to temporary views in most SQL systems.)
+-- MAGIC Databricksの他の場所で使用されるビューとは異なり、DLTビューはメタストアに永続されないため、それらは所属するDLTパイプライン内からのみ参照できます（これはほとんどのSQLシステムの一時ビューと同じスコーピングです）。
 -- MAGIC
--- MAGIC Views can still be used to enforce data quality, and metrics for views will be collected and reported as they would be for tables.
+-- MAGIC ビューは引き続きデータ品質を強制するために使用でき、ビューのメトリクスはテーブルのように収集および報告されます。
 -- MAGIC
 -- MAGIC ## Joins and Referencing Tables Across Notebook Libraries
 -- MAGIC
--- MAGIC The code we've reviewed thus far has shown 2 source datasets propagating through a series of steps in separate notebooks.
+-- MAGIC これまでに確認したコードは、2つのソースデータセットが異なるノートブックで一連の手順を伝播するのを示しています。
 -- MAGIC
--- MAGIC DLT supports scheduling multiple notebooks as part of a single DLT Pipeline configuration. You can edit existing DLT pipelines to add additional notebooks.
+-- MAGIC DLTは、1つのDLTパイプライン構成の一部として複数のノートブックをスケジュールすることをサポートしています。既存のDLTパイプラインを編集して追加のノートブックを追加できます。
 -- MAGIC
--- MAGIC Within a DLT Pipeline, code in any notebook library can reference tables and views created in any other notebook library.
+-- MAGIC DLTパイプライン内では、任意のノートブックライブラリで作成されたテーブルとビューを参照できます。
 -- MAGIC
--- MAGIC Essentially, we can think of the scope of the schema reference by the **`LIVE`** keyword to be at the DLT Pipeline level, rather than the individual notebook.
+-- MAGIC 基本的には、 **`LIVE`** キーワードによって参照されるスキーマのスコープを個々のノートブックではなくDLTパイプラインレベルと考えることができます。
 -- MAGIC
--- MAGIC In the query below, we create a new view by joining the silver tables from our **`orders`** and **`customers`** datasets. Note that this view is not defined as streaming; as such, we will always capture the current valid **`email`** for each customer, and will automatically drop records for customers after they've been deleted from the **`customers_silver`** table.
+-- MAGIC 以下のクエリでは、 **`orders`** および **`customers`** データセットからのシルバーテーブルを結合して新しいビューを作成しています。このビューはストリーミングとして定義されていないため、常に各顧客の現在の有効な **`email`** がキャプチャされ、 **`customers_silver`** テーブルから削除された後はレコードが自動的に削除されます。
+-- MAGIC
 
 -- COMMAND ----------
 
@@ -200,34 +201,38 @@ CREATE LIVE VIEW subscribed_order_emails_v
 
 -- DBTITLE 0,--i18n-d4a1dd79-e8e6-4d18-bf00-c5d49cd04b04
 -- MAGIC %md
--- MAGIC ## Adding this Notebook to a DLT Pipeline
 -- MAGIC
--- MAGIC Adding additional notebook libraries to an existing pipeline is accomplished easily with the DLT UI.
+-- MAGIC ## このノートブックをDLTパイプラインに追加
 -- MAGIC
--- MAGIC 1. Navigate to the DLT Pipeline you configured earlier in the course
--- MAGIC 1. Click the **Settings** button in the top right
--- MAGIC 1. Under **Notebook Libraries**, click **Add notebook library**
--- MAGIC    * Use the file picker to select this notebook, then click **Select**
--- MAGIC 1. Click the **Save** button to save your updates
--- MAGIC 1. Click the blue **Start** button in the top right of the screen to update your pipeline and process any new records
+-- MAGIC 既存のパイプラインに追加のノートブック ライブラリを追加するのは、DLT UI を使用して簡単に行えます。
 -- MAGIC
--- MAGIC <img src="https://files.training.databricks.com/images/icon_hint_24.png"> The link to this notebook can be found back in [DE 4.1 - DLT UI Walkthrough]($../DE 4.1 - DLT UI Walkthrough)<br/>
--- MAGIC in the printed instructions for **Task #2** under the section **Generate Pipeline Configuration**
+-- MAGIC 1. このコースで既に構成したDLTパイプラインに移動します
+-- MAGIC 1. 画面右上の **Settings** ボタンをクリックします
+-- MAGIC 1. **Notebook Libraries** の下で、**Add notebook library** をクリックします
+-- MAGIC    * ファイルピッカーを使用してこのノートブックを選択し、**Select** をクリックします
+-- MAGIC 1. 更新を保存するために **Save** ボタンをクリックします
+-- MAGIC 1. 画面右上の青い **Start** ボタンをクリックして、パイプラインを更新し、新しいレコードを処理します
+-- MAGIC
+-- MAGIC <img src="https://files.training.databricks.com/images/icon_hint_24.png"> このノートブックへのリンクは、[DE 4.1 - DLT UI Walkthrough]($../DE 4.1 - DLT UI Walkthrough)の<br/>
+-- MAGIC **Task #2** の **Generate Pipeline Configuration** セクションの指示の中にあります
+-- MAGIC
 
 -- COMMAND ----------
 
 -- DBTITLE 0,--i18n-5c0ccf2a-333a-4d7c-bfef-b4b25e56b3ca
 -- MAGIC %md
--- MAGIC ## Summary
 -- MAGIC
--- MAGIC By reviewing this notebook, you should now feel comfortable:
--- MAGIC * Processing CDC data with **`APPLY CHANGES INTO`**
--- MAGIC * Declaring live views
--- MAGIC * Joining live tables
--- MAGIC * Describing how DLT library notebooks work together in a pipeline
--- MAGIC * Scheduling multiple notebooks in a DLT pipeline
+-- MAGIC ## 概要
 -- MAGIC
--- MAGIC In the next notebook, explore the output of our pipeline. Then we'll take a look at how to iteratively develop and troubleshoot DLT code.
+-- MAGIC このノートブックを確認することで、以下の作業に慣れるようになるでしょう：
+-- MAGIC * **`APPLY CHANGES INTO`** を使用して CDC データを処理する
+-- MAGIC * ライブビューを宣言する
+-- MAGIC * ライブテーブルを結合する
+-- MAGIC * DLT ライブラリ ノートブックがどのように連携するかを説明する
+-- MAGIC * DLT パイプラインで複数のノートブックをスケジュールする
+-- MAGIC
+-- MAGIC 次のノートブックでは、パイプラインの出力を探索します。その後、DLT コードの反復的な開発とトラブルシューティングの方法を見ていきます。
+-- MAGIC
 
 -- COMMAND ----------
 

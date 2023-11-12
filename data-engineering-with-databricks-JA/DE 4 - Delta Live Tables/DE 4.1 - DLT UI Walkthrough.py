@@ -9,21 +9,21 @@
 
 # DBTITLE 0,--i18n-da41af42-59a3-42d8-af6d-4ab96146397c
 # MAGIC %md
-# MAGIC # Using the Delta Live Tables UI
+# MAGIC # Delta Live Tables UIの使用
 # MAGIC
-# MAGIC This demo will explore the DLT UI. By the end of this lesson you will be able to: 
+# MAGIC このデモでは、DLT UIを探索します。このレッスンの終わりまでに、次のことができるようになります：
 # MAGIC
-# MAGIC * Deploy a DLT pipeline
-# MAGIC * Explore the resultant DAG
-# MAGIC * Execute an update of the pipeline
+# MAGIC * DLTパイプラインをデプロイする
+# MAGIC * 結果のDAGを探索する
+# MAGIC * パイプラインの更新を実行する
 
 # COMMAND ----------
 
 # DBTITLE 0,--i18n-d84e8f59-6cda-4c81-8547-132eb20b48b2
 # MAGIC %md
-# MAGIC ## Classroom Setup
+# MAGIC ## クラスルームのセットアップ
 # MAGIC
-# MAGIC Run the following cell to configure your working environment for this course.
+# MAGIC このコースの作業環境を構成するには、次のセルを実行してください。
 
 # COMMAND ----------
 
@@ -34,12 +34,12 @@
 # DBTITLE 0,--i18n-ba2a4dfe-ca17-4070-b35a-37068ff9c51d
 # MAGIC %md
 # MAGIC
-# MAGIC ## Generate Pipeline Configuration
-# MAGIC Configuring this pipeline will require parameters unique to a given user.
+# MAGIC ## パイプラインの構成生成
+# MAGIC このパイプラインの構成には、特定のユーザーに固有のパラメータが必要です。
 # MAGIC
-# MAGIC In the code cell below, specify which language to use by uncommenting the appropriate line.
+# MAGIC 以下のコードセルで、使用する言語を指定するには、適切な行のコメントを解除します。
 # MAGIC
-# MAGIC Then, run the cell to print out values you'll use to configure your pipeline in subsequent steps.
+# MAGIC その後、セルを実行して、次の手順でパイプラインを構成するために使用する値を出力します。
 
 # COMMAND ----------
 
@@ -52,46 +52,46 @@ DA.print_pipeline_config(pipeline_language)
 
 # DBTITLE 0,--i18n-bc4e7bc9-67e1-4393-a3c5-79a1f585cdc8
 # MAGIC %md
-# MAGIC In this lesson, we deploy a pipeline with a single notebook, specified as Notebook #1 in the cell output above. 
+# MAGIC このレッスンでは、セルの出力でノートブック＃1として指定された単一のノートブックでパイプラインを展開します。
 # MAGIC
-# MAGIC <img src="https://files.training.databricks.com/images/icon_hint_24.png"> **HINT:**  You'll want to refer back to the paths above when we add Notebook #2 and #3 to the pipeline in later lessons.
+# MAGIC <img src="https://files.training.databricks.com/images/icon_hint_24.png"> **ヒント:** 後のレッスンでパイプラインにノートブック＃2と＃3を追加する際に、上記のパスを参照することがお勧めです。
 
 # COMMAND ----------
 
 # DBTITLE 0,--i18n-9b609cc5-91c8-4213-b6f7-1c737a6e44a3
 # MAGIC %md
-# MAGIC ## Create and Configure a Pipeline
+# MAGIC ## パイプラインの作成と構成
 # MAGIC
-# MAGIC Let's start by creating a pipeline with a single notebook (Notebook #1).
+# MAGIC まず、単一のノートブック（ノートブック＃1）を使用してパイプラインを作成します。
 # MAGIC
-# MAGIC Steps:
-# MAGIC 1. Click the **Workflows** button on the sidebar, click the **Delta Live Tables** tab, and click **Create Pipeline**. 
-# MAGIC 2. Configure the pipeline as specified below. You'll need the values provided in the cell output above for this step.
+# MAGIC 手順：
+# MAGIC 1. サイドバーの **Workflows** ボタンをクリックし、 **Delta Live Tables** タブをクリックし、 **Create Pipeline** をクリックします。
+# MAGIC 2. 以下の指示に従ってパイプラインを構成します。この手順では、上記のセル出力で提供された値が必要です。
 # MAGIC
-# MAGIC | Setting | Instructions |
+# MAGIC | 設定 | 指示 |
 # MAGIC |--|--|
-# MAGIC | Pipeline name | Enter the **Pipeline Name** provided above |
-# MAGIC | Product edition | Choose **Advanced** |
-# MAGIC | Pipeline mode | Choose **Triggered** |
-# MAGIC | Cluster policy | Choose the **Policy** provided above |
-# MAGIC | Notebook libraries | Use the navigator to select or enter the **Notebook # 1 Path** provided above |
-# MAGIC | Storage location | Enter the **Storage Location** provided above |
-# MAGIC | Target schema | Enter the **Target** database name provided above |
-# MAGIC | Cluster mode | Choose **Fixed size** to disable auto scaling for your cluster |
-# MAGIC | Workers | Enter **0** to use a Single Node cluster |
-# MAGIC | Photon Acceleration | Check this checkbox to enable |
-# MAGIC | Configuration | Click **Advanced** to view additional settings,<br>Click **Add Configuration** to input the **Key** and **Value** for row #1 in the table below,<br>Click **Add Configuration** to input the **Key** and **Value** for row #2 in the table below |
-# MAGIC | Channel | Choose **Current** to use the current runtime version |
+# MAGIC | パイプライン名 | 上記の **Pipeline Name** を入力します |
+# MAGIC | 製品版 | **Advanced** を選択します |
+# MAGIC | パイプラインモード | **Triggered** を選択します |
+# MAGIC | クラスターポリシー | 上記の **Policy** を選択します |
+# MAGIC | ノートブックライブラリ | ナビゲーターを使用して、上記の **Notebook # 1 Path** を選択または入力します |
+# MAGIC | ストレージの場所 | 上記の **Storage Location** を入力します |
+# MAGIC | ターゲットスキーマ | 上記の **Target** データベース名を入力します |
+# MAGIC | クラスターモード | クラスターの自動スケーリングを無効にするには、 **Fixed size** を選択します |
+# MAGIC | ワーカー | シングルノードクラスターを使用するには、 **0** を入力します |
+# MAGIC | Photon Acceleration | これを有効にするには、このチェックボックスをオンにします |
+# MAGIC | 構成 | 追加の設定を表示するには、 **Advanced** をクリックします。<br>表の下の行＃1に **Key** と **Value** を入力するには、 **Add Configuration** をクリックします。<br>表の下の行＃2に **Key** と **Value** を入力するには、 **Add Configuration** をクリックします |
+# MAGIC | チャネル | **Current** を選択して、現在のランタイムバージョンを使用します |
 # MAGIC
-# MAGIC | Configuration | Key                 | Value                                      |
+# MAGIC | 構成 | キー | 値 |
 # MAGIC | ------------- | ------------------- | ------------------------------------------ |
-# MAGIC | #1            | **`spark.master`**  | **`local[*]`**                             |
-# MAGIC | #2            | **`source`** | Enter the **source** provided above |
+# MAGIC | ＃1 | **`spark.master`** | **`local[*]`** |
+# MAGIC | ＃2 | **`source`** | 上記の **source** を入力します |
 # MAGIC
 # MAGIC <br>
 # MAGIC
-# MAGIC 3. Click the **Create** button.
-# MAGIC 4. Verify that the pipeline mode is set to **Development**.
+# MAGIC 3. **Create** ボタンをクリックします。
+# MAGIC 4. パイプラインモードが **Development** に設定されていることを確認します。
 
 # COMMAND ----------
 
@@ -101,52 +101,55 @@ DA.validate_pipeline_config(pipeline_language)
 
 # DBTITLE 0,--i18n-d8e19679-0c2f-48cc-bc80-5f1243ff94c8
 # MAGIC %md
-# MAGIC #### Additional Notes on Pipeline Configuration
-# MAGIC Here are a few notes regarding the pipeline settings above:
+# MAGIC #### パイプライン構成に関する追加の注意事項
+# MAGIC 上記のパイプライン設定に関するいくつかの注意事項です。
 # MAGIC
-# MAGIC - **Pipeline mode** - This specifies how the pipeline will be run. Choose the mode based on latency and cost requirements.
-# MAGIC   - `Triggered` pipelines run once and then shut down until the next manual or scheduled update.
-# MAGIC   - `Continuous` pipelines run continuously, ingesting new data as it arrives.
-# MAGIC - **Notebook libraries** - Even though this document is a standard Databricks Notebook, the SQL syntax is specialized to DLT table declarations. We will be exploring the syntax in the exercise that follows.
-# MAGIC - **Storage location** - This optional field allows the user to specify a location to store logs, tables, and other information related to pipeline execution. If not specified, DLT will automatically generate a directory.
-# MAGIC - **Target** - If this optional field is not specified, tables will not be registered to a metastore, but will still be available in the DBFS. See <a href="https://docs.databricks.com/data-engineering/delta-live-tables/delta-live-tables-user-guide.html#publish-tables" target="_blank">documentation</a> for more information on this option.
-# MAGIC - **Cluster mode**, **Min Workers**, **Max Workers** - These fields control the worker configuration for the underlying cluster processing the pipeline. Here, we set the number of workers to 0. This works in conjunction with the **spark.master** parameter defined above to configure the cluster as a Single Node cluster.
-# MAGIC - **source** - These keys are caps sensitive. Make sure you've got all lower case letters for the word "source"!
+# MAGIC - **Pipeline mode** - これはパイプラインがどのように実行されるかを指定します。モードは、レイテンシとコストの要件に基づいて選択します。
+# MAGIC   - `Triggered` パイプラインは一度実行され、次の手動またはスケジュールされた更新までシャットダウンします。
+# MAGIC   - `Continuous` パイプラインは継続的に実行され、新しいデータが到着するたびにデータを取り込みます。
+# MAGIC - **Notebook libraries** - この文書は標準の Databricks ノートブックですが、SQL 構文は DLT テーブルの宣言に特化しています。この構文については、以下の演習で詳しく説明します。
+# MAGIC - **Storage location** - このオプションのフィールドを使用すると、パイプラインの実行に関連するログ、テーブルなどを保存する場所を指定できます。指定しない場合、DLT は自動的にディレクトリを生成します。
+# MAGIC - **Target** - このオプションのフィールドが指定されていない場合、テーブルはメタストアに登録されませんが、DBFS で利用できます。このオプションに関する詳細な情報については、<a href="https://docs.databricks.com/data-engineering/delta-live-tables/delta-live-tables-user-guide.html#publish-tables" target="_blank">ドキュメント</a>を参照してください。
+# MAGIC - **Cluster mode**、**Min Workers**、**Max Workers** - これらのフィールドは、パイプラインを処理する基本クラスターのワーカー構成を制御します。ここでは、ワーカーの数を 0 に設定しています。これは上記で定義した **spark.master** パラメータと連動して、クラスターをシングルノードクラスターとして構成します。
+# MAGIC - **source** - これらのキーは大文字小文字を区別します。単語 "source" はすべて小文字であることを確認してください！
+# MAGIC
 
 # COMMAND ----------
 
 # DBTITLE 0,--i18n-6f8d9d42-99e2-40a5-b80e-a6e6fedd7279
 # MAGIC %md
-# MAGIC ## Run a Pipeline
+# MAGIC ## パイプラインの実行
 # MAGIC
-# MAGIC With a pipeline created, you will now run the pipeline.
+# MAGIC パイプラインが作成されたら、次にそのパイプラインを実行します。
 # MAGIC
-# MAGIC 1. Select **Development** to run the pipeline in development mode. Development mode provides for more expeditious iterative development by reusing the cluster (as opposed to creating a new cluster for each run) and disabling retries so that you can readily identify and fix errors. Refer to the <a href="https://docs.databricks.com/data-engineering/delta-live-tables/delta-live-tables-user-guide.html#optimize-execution" target="_blank">documentation</a> for more information on this feature.
-# MAGIC 2. Click **Start**.
+# MAGIC 1. **Development** を選択して、パイプラインを開発モードで実行します。開発モードでは、クラスターを再利用して（各実行ごとに新しいクラスターを作成するのではなく）、エラーをすぐに特定して修正できるように、リトライを無効にしています。この機能についての詳細は、<a href="https://docs.databricks.com/data-engineering/delta-live-tables/delta-live-tables-user-guide.html#optimize-execution" target="_blank">ドキュメント</a>を参照してください。
+# MAGIC 2. **Start** をクリックします。
 # MAGIC
-# MAGIC The initial run will take several minutes while a cluster is provisioned. Subsequent runs will be appreciably quicker.
+# MAGIC 初回の実行はクラスターがプロビジョニングされるため、数分かかります。2回目以降の実行はかなり速くなります。
+# MAGIC
 
 # COMMAND ----------
 
 # DBTITLE 0,--i18n-75d0f6d5-17c6-419e-aacf-be7560f394b6
 # MAGIC %md
-# MAGIC ## Explore the DAG
+# MAGIC ## DAGの探索
 # MAGIC
-# MAGIC As the pipeline completes, the execution flow is graphed. 
+# MAGIC パイプラインが完了すると、実行フローがグラフで表示されます。
 # MAGIC
-# MAGIC Selecting the tables reviews the details.
+# MAGIC テーブルを選択して詳細を確認します。
 # MAGIC
-# MAGIC Select **orders_silver**. Notice the results reported in the **Data Quality** section. 
+# MAGIC **orders_silver** を選択します。**Data Quality** セクションで報告されている結果に注意してください。
 # MAGIC
-# MAGIC With each triggered update, all newly arriving data will be processed through your pipeline. Metrics will always be reported for current run.
+# MAGIC トリガーされる更新ごとに、すべての新しく到着したデータがパイプラインを通過します。メトリクスは常に現在の実行に対して報告されます。
+# MAGIC
 
 # COMMAND ----------
 
 # DBTITLE 0,--i18n-4cef0694-c05f-44ba-84bf-cd14a63eda17
 # MAGIC %md
-# MAGIC ## Land another batch of data
+# MAGIC ## 別のバッチのデータを着陸させる
 # MAGIC
-# MAGIC Run the cell below to land more data in the source directory, then manually trigger a pipeline update.
+# MAGIC 以下のセルを実行して、ソースディレクトリにさらにデータを着陸させ、その後手動でパイプラインの更新をトリガーします。
 
 # COMMAND ----------
 
@@ -156,11 +159,9 @@ DA.dlt_data_factory.load()
 
 # DBTITLE 0,--i18n-58129206-f245-419e-b51e-b126376a9a45
 # MAGIC %md
-# MAGIC As we continue through the course, you can return to this notebook and use the method provided above to land new data.
-# MAGIC
-# MAGIC Running this entire notebook again will delete the underlying data files for both the source data and your DLT Pipeline. 
-# MAGIC
-# MAGIC If you get disconnected from your cluster or have some other event where you wish to land more data without deleting things, refer to the <a href="$./DE 4.99 - Land New Data" target="_blank">DE 4.99 - Land New Data</a> notebook.
+# MAGIC コースを進める中で、このノートブックに戻り、上記の手順を使用して新しいデータをロードすることができます。
+# MAGIC このノートブック全体を再実行すると、ソースデータとDLTパイプラインの基になるデータファイルが削除されます。
+# MAGIC データを削除せずに新しいデータをロードしたい場合や、クラスタから切断された場合などは、<a href="$./DE 4.99 - Land New Data" target="_blank">DE 4.99 - Land New Data</a> ノートブックを参照してください。
 
 # COMMAND ----------
 

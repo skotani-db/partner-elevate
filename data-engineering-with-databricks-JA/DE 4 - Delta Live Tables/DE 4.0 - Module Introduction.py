@@ -9,44 +9,48 @@
 
 # DBTITLE 0,--i18n-05f37e48-e8d1-4b0c-87e8-38cd4c42edc6
 # MAGIC %md
-# MAGIC ## Building Data Pipelines with Delta Live Tables
-# MAGIC This module is part of the Data Engineer Learning Path by Databricks Academy.
+# MAGIC
+# MAGIC ## Delta Live Tablesを使用したデータパイプラインの構築
+# MAGIC このモジュールは、Databricks Academyのデータエンジニアラーニングパスの一部です。
 # MAGIC
 # MAGIC #### DLT UI
 # MAGIC
-# MAGIC Lecture: The Medellion Architecture <br>
-# MAGIC Lecture: Introduction to Delta Live Tables <br>
+# MAGIC Lecture: The Medellion Architecture（講義：メデリオンアーキテクチャ） <br>
+# MAGIC Lecture: Introduction to Delta Live Tables（講義：Delta Live Tablesへの導入） <br>
 # MAGIC [DE 4.1 - Using the DLT UI]($./DE 4.1 - DLT UI Walkthrough) <br>
 # MAGIC
-# MAGIC #### DLT Syntax
-# MAGIC DE 4.1.1 - Orders Pipeline: [SQL]($./DE 4.1A - SQL Pipelines/DE 4.1.1 - Orders Pipeline) or [Python]($./DE 4.1B - Python Pipelines/DE 4.1.1 - Orders Pipeline)<br>
-# MAGIC DE 4.1.2 - Customers Pipeline: [SQL]($./DE 4.1A - SQL Pipelines/DE 4.1.2 - Customers Pipeline) or [Python]($./DE 4.1B - Python Pipelines/DE 4.1.2 - Customers Pipeline) <br>
+# MAGIC #### DLT Syntax（DLT構文）
+# MAGIC
+# MAGIC DE 4.1.1 - Orders Pipeline: [SQL]($./DE 4.1A - SQL Pipelines/DE 4.1.1 - Orders Pipeline) または [Python]($./DE 4.1B - Python Pipelines/DE 4.1.1 - Orders Pipeline)<br>
+# MAGIC DE 4.1.2 - Customers Pipeline: [SQL]($./DE 4.1A - SQL Pipelines/DE 4.1.2 - Customers Pipeline) または [Python]($./DE 4.1B - Python Pipelines/DE 4.1.2 - Customers Pipeline) <br>
 # MAGIC [DE 4.2 - Python vs SQL]($./DE 4.2 - Python vs SQL) <br>
 # MAGIC
-# MAGIC #### Pipeline Results, Monitoring, and Troubleshooting
+# MAGIC #### パイプラインの結果、モニタリング、およびトラブルシューティング
+# MAGIC
 # MAGIC [DE 4.3 - Pipeline Results]($./DE 4.3 - Pipeline Results) <br>
 # MAGIC [DE 4.4 - Pipeline Event Logs]($./DE 4.4 - Pipeline Event Logs) <br>
-# MAGIC DE 4.1.3 - Status Pipeline: [SQL]($./DE 4.1A - SQL Pipelines/DE 4.1.3 - Status Pipeline) or [Python]($./DE 4.1B - Python Pipelines/DE 4.1.3 - Status Pipeline) <br>
+# MAGIC DE 4.1.3 - Status Pipeline: [SQL]($./DE 4.1A - SQL Pipelines/DE 4.1.3 - Status Pipeline) または [Python]($./DE 4.1B - Python Pipelines/DE 4.1.3 - Status Pipeline) <br>
 # MAGIC [DE 4.99 - Land New Data]($./DE 4.99 - Land New Data) <br>
 # MAGIC
-# MAGIC #### Prerequisites
+# MAGIC #### 必要な前提条件
 # MAGIC
-# MAGIC * Beginner familiarity with cloud computing concepts (virtual machines, object storage, etc.)
-# MAGIC * Ability to perform basic code development tasks using the Databricks Data Engineering & Data Science workspace (create clusters, run code in notebooks, use basic notebook operations, import repos from Git, etc)
-# MAGIC * Beginning programming experience with Delta Lake
-# MAGIC * Use Delta Lake DDL to create tables, compact files, restore previous table versions, and perform garbage collection of tables in the Lakehouse
-# MAGIC   * Use CTAS to store data derived from a query in a Delta Lake table
-# MAGIC   * Use SQL to perform complete and incremental updates to existing tables
-# MAGIC * Beginning programming experience with Spark SQL or PySpark
-# MAGIC   * Extract data from a variety of file formats and data sources
-# MAGIC   * Apply a number of common transformations to clean data
-# MAGIC   * Reshape and manipulate complex data using advanced built-in functions
-# MAGIC * Production experience working with data warehouses and data lakes
+# MAGIC * クラウドコンピューティングの基本的な概念についての初級の理解（仮想マシン、オブジェクトストレージなど）
+# MAGIC * Databricksデータエンジニアリング＆データサイエンスワークスペースを使用して基本的なコード開発タスクを実行できること（クラスタの作成、ノートブックでのコード実行、基本的なノートブック操作、Gitからのリポジトリのインポートなど）
+# MAGIC * Delta Lakeの初級プログラミング経験
+# MAGIC   * Delta Lake DDLを使用してテーブルを作成し、ファイルを最適化し、以前のテーブルバージョンを復元し、Lakehouseのテーブルのガベージコレクションを実行する
+# MAGIC   * CTASを使用して、クエリから派生したデータをDelta Lakeテーブルに保存する
+# MAGIC   * SQLを使用して既存のテーブルに対して完全および増分の更新を実行する
+# MAGIC * Spark SQLまたはPySparkの初級プログラミング経験
+# MAGIC   * さまざまなファイル形式およびデータソースからデータを抽出する
+# MAGIC   * 一般的な変換を適用してデータをクリーンにする
+# MAGIC   * 高度な組み込み関数を使用して複雑なデータを整形および操作する
+# MAGIC * データウェアハウスおよびデータレイクでのプロダクション経験
 # MAGIC
-# MAGIC #### Technical Considerations
+# MAGIC #### 技術的な考慮事項
 # MAGIC
-# MAGIC * This course runs on DBR 11.3.
-# MAGIC * This course cannot be delivered on Databricks Community Edition.
+# MAGIC * このコースはDBR 11.3で実行されます。
+# MAGIC * このコースはDatabricks Community Editionでは提供できません。
+# MAGIC
 
 # COMMAND ----------
 
