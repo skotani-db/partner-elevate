@@ -9,29 +9,29 @@
 
 # DBTITLE 0,--i18n-26e0e9c0-768d-4b35-9e7c-edf0bbca828b
 # MAGIC %md
-# MAGIC ## Managing Data Access for Analytics
-# MAGIC This module is part of the Data Engineer Learning Path by Databricks Academy.
+# MAGIC ## アナリティクスのためのデータアクセスの管理
+# MAGIC このモジュールは、Databricks Academyのデータエンジニアリングラーニングパスの一部です。
 # MAGIC
-# MAGIC #### Lessons
-# MAGIC Lecture: Introduction to Unity Catalog<br>
-# MAGIC DE 6.1 - [Create and Govern Data with UC]($./DE 6.1 - Create and Govern Data with UC)<br>
-# MAGIC DE 6.2L - [Create and Share Tables in Unity Catalog]($./DE 6.2L - Create and Share Tables in Unity Catalog)<br>
-# MAGIC DE 6.3L - [Create Views and Limit Table Access]($./DE 6.3L - Create Views and Limit Table Access)<br>
-# MAGIC
-# MAGIC
-# MAGIC #### Administration with Unity Catalog - OPTIONAL
-# MAGIC DE 6.99 - OPTIONAL Administration<br>
-# MAGIC DE 6.99.2 - [Create compute resources for Unity Catalog access]($./DE 6.99 - OPTIONAL Administration/DE 6.99.2 - Create compute resources for Unity Catalog access)<br>
-# MAGIC DE 6.99.3 - [Upgrade a Table to Unity Catalog]($./DE 6.99 - OPTIONAL Administration/DE 6.99.3 - OPTIONAL Upgrade a Table to Unity Catalog)<br>
+# MAGIC #### レッスン
+# MAGIC 講義：Unityカタログの紹介<br>
+# MAGIC DE 6.1 - [UCを使用してデータを作成および管理する]($./DE 6.1 - Create and Govern Data with UC)<br>
+# MAGIC DE 6.2L - [Unityカタログでテーブルを作成および共有する]($./DE 6.2L - Create and Share Tables in Unity Catalog)<br>
+# MAGIC DE 6.3L - [ビューの作成とテーブルアクセスの制限]($./DE 6.3L - Create Views and Limit Table Access)<br>
 # MAGIC
 # MAGIC
-# MAGIC #### Prerequisites
-# MAGIC * Beginning-level knowledge of the Databricks Lakehouse platform (high-level knowledge of the structure and benefits of the Lakehouse platform)
-# MAGIC * Beginning-level knowledge of SQL (ability to understand and construct basic queries)
+# MAGIC #### Unityカタログを使用した管理 - オプション
+# MAGIC DE 6.99 - オプションの管理<br>
+# MAGIC DE 6.99.2 - [Unityカタログアクセスのためのコンピュートリソースの作成]($./DE 6.99 - OPTIONAL Administration/DE 6.99.2 - Create compute resources for Unity Catalog access)<br>
+# MAGIC DE 6.99.3 - [テーブルをUnityカタログにアップグレード]($./DE 6.99 - OPTIONAL Administration/DE 6.99.3 - OPTIONAL Upgrade a Table to Unity Catalog)<br>
 # MAGIC
 # MAGIC
-# MAGIC #### Technical Considerations
-# MAGIC This course cannot be delivered on Databricks Community Edition, and can only be delivered on clouds supporting Unity Catalog. Administration access at both the workspace and account level is required to fully perform all exercises. A few optional tasks are demonstrated that additionally require low-level access to the cloud environment.
+# MAGIC #### 必要条件
+# MAGIC * Databricks Lakehouseプラットフォームに関する初級レベルの知識（Lakehouseプラットフォームの構造と利点に関する高レベルの知識）
+# MAGIC * SQLの初級レベルの知識（基本的なクエリの理解と構築の能力）
+# MAGIC
+# MAGIC
+# MAGIC #### 技術的考慮事項
+# MAGIC このコースは、Databricks Community Editionでは提供できず、Unityカタログをサポートするクラウドでのみ提供できます。すべての演習を完全に実行するには、ワークスペースとアカウントのレベルでの管理アクセスが必要です。クラウド環境への低レベルのアクセスも必要とするいくつかのオプションのタスクが実演されています。
 
 # COMMAND ----------
 

@@ -9,32 +9,32 @@
 
 -- DBTITLE 0,--i18n-b5d0b5d6-287e-4dcd-8a4b-a0fe2b12b615
 -- MAGIC %md
--- MAGIC # Create and govern data objects with Unity Catalog
+-- MAGIC # Unity Catalogを使用してデータオブジェクトを作成および管理する
 -- MAGIC
--- MAGIC In this notebook you will learn how to:
--- MAGIC * Create catalogs, schemas, tables, views and user-defined functions
--- MAGIC * Control access to these objects
--- MAGIC * Use dynamic views to protect columns and rows within tables
--- MAGIC * Explore grants on various objects in Unity Catalog
+-- MAGIC このノートブックでは、次のことを学びます：
+-- MAGIC * カタログ、スキーマ、テーブル、ビュー、およびユーザー定義関数の作成
+-- MAGIC * これらのオブジェクトへのアクセス制御
+-- MAGIC * テーブル内の列と行を保護するための動的ビューの使用
+-- MAGIC * Unity Catalog内のさまざまなオブジェクトに関する権限の調査
 
 -- COMMAND ----------
 
 -- DBTITLE 0,--i18n-63c92b27-28a0-41f8-8761-a9ec5bb574e0
 -- MAGIC %md
--- MAGIC ## Prerequisites
+-- MAGIC ## 前提条件
 -- MAGIC
--- MAGIC If you would like to follow along with this lab, you must:
--- MAGIC * Have metastore admin permissions in order to create and manage a catalog
--- MAGIC * Have a SQL warehouse to which the user mentioned above has access
--- MAGIC   * See notebook: Creating compute resources for Unity Catalog access
+-- MAGIC このラボに従いたい場合、次のことが必要です：
+-- MAGIC * カタログを作成および管理するためのメタストア管理者権限を持っていること
+-- MAGIC * ユーザーがアクセスできるSQLデータベースを持っていること
+-- MAGIC   * ユーザーが上記に言及されているアクセス権を持っている場合、ノートブックを参照してください：Unity Catalogアクセスのためのコンピュートリソースの作成
 
 -- COMMAND ----------
 
 -- DBTITLE 0,--i18n-67495bbd-0f5b-4f81-9974-d5c6360fb86c
 -- MAGIC %md
--- MAGIC ## Setup
+-- MAGIC ## セットアップ
 -- MAGIC
--- MAGIC Run the following cell to perform some setup. In order to avoid conflicts in a shared training environment, this will generate a unique catalog name exclusively for your use, which we will employ shortly.
+-- MAGIC 以下のセルを実行してセットアップを行います。共有トレーニング環境での競合を避けるため、これにより専用に使用するための一意のカタログ名が生成されます。後で使用します。
 
 -- COMMAND ----------
 
@@ -44,32 +44,32 @@
 
 -- DBTITLE 0,--i18n-a0720484-97de-4742-9c38-6c5bd312f3d7
 -- MAGIC %md
--- MAGIC ## Unity Catalog's three-level namespace
+-- MAGIC ## Unity Catalogの三段階の名前空間
 -- MAGIC
--- MAGIC Anyone with SQL experience will likely be familiar with the traditional two-level namespace to address tables or views within a schema as follows, as shown in the following example query:
+-- MAGIC SQLの経験がある場合、スキーマ内のテーブルまたはビューをアドレスするための従来の二段階の名前空間についてはおそらく既知のものでしょう。次のクエリの例に示すように、次のように表されます。
 -- MAGIC
 -- MAGIC     SELECT * FROM myschema.mytable;
 -- MAGIC
--- MAGIC Unity Catalog introduces the concept of a **catalog** into the hierarchy. As a container for schemas, the catalog provides a new way for organizations to segregate their data. There can be as many catalogs as you like, which in turn can contain as many schemas as you like (the concept of a **schema** is unchanged by Unity Catalog; schemas contain data objects like tables, views, and user-defined functions).
+-- MAGIC Unity Catalogは、階層に**カタログ**という概念を導入します。スキーマのコンテナとして、カタログはデータを分離する新しい方法を提供します。カタログはいくつでも作成でき、それぞれにいくつでもスキーマ（スキーマの概念はUnity Catalogによって変更されず、スキーマにはテーブル、ビュー、ユーザー定義関数などのデータオブジェクトが含まれます）を含めることができます。
 -- MAGIC
--- MAGIC To deal with this additional level, complete table/view references in Unity Catalog use a three-level namespace. The following query exemplifies this:
+-- MAGIC この追加のレベルを扱うために、Unity Catalogの完全なテーブル/ビュー参照は三段階の名前空間を使用します。次のクエリはこれを示しています。
 -- MAGIC
 -- MAGIC     SELECT * FROM mycatalog.myschema.mytable;
 -- MAGIC
--- MAGIC This can be handy in many use cases. For example:
+-- MAGIC これは多くのユースケースで便利です。たとえば：
 -- MAGIC
--- MAGIC * Separating data relating to business units within your organization (sales, marketing, human resources, etc)
--- MAGIC * Satisfying SDLC requirements (dev, staging, prod, etc)
--- MAGIC * Establishing sandboxes containing temporary datasets for internal use
+-- MAGIC * 組織内のビジネスユニット（営業、マーケティング、人事など）に関連するデータを分離する
+-- MAGIC * SDLC要件（dev、staging、prodなど）を満たす
+-- MAGIC * 内部での一時的なデータセットを含むサンドボックスを設立する
 
 -- COMMAND ----------
 
 -- DBTITLE 0,--i18n-aa4c68dc-6dc3-4aca-a352-affc98ac8089
 -- MAGIC %md
--- MAGIC ### Create a new catalog
--- MAGIC Let's create a new catalog in our metastore. The variable **`${DA.my_new_catalog}`** was displayed by the setup cell above, containing a unique string generated based on your username.
+-- MAGIC ### 新しいカタログを作成
+-- MAGIC メタストアに新しいカタログを作成しましょう。変数**`${DA.my_new_catalog}`**は、セットアップセルで表示され、ユーザー名に基づいて生成された一意の文字列を含んでいます。
 -- MAGIC
--- MAGIC Run the **`CREATE`** statement below, and click the **Data** icon in the left sidebar to confirm this new catalog was created.
+-- MAGIC 以下の**`CREATE`**ステートメントを実行し、左のサイドバーにある**Data**アイコンをクリックして、この新しいカタログが作成されたことを確認してください。
 
 -- COMMAND ----------
 
@@ -79,14 +79,14 @@ CREATE CATALOG IF NOT EXISTS ${DA.my_new_catalog}
 
 -- DBTITLE 0,--i18n-e1f478c8-bbf2-4368-9cdd-e130d2fb7410
 -- MAGIC %md
--- MAGIC ### Select a default catalog
+-- MAGIC ### デフォルトのカタログを選択
 -- MAGIC
--- MAGIC SQL developers will probably also be familiar with the **`USE`** statement to select a default schema, thereby shortening queries by not having to specify it all the time. To extend this convenience while dealing with the extra level in the namespace, Unity Catalog augments the language with two additional statements, shown in the examples below:
+-- MAGIC SQLの開発者は、デフォルトのスキーマを選択するために**`USE`**ステートメントにも慣れているかもしれません。これにより、常に指定する必要がなくなり、クエリが短縮されます。ネームスペースの追加レベルを扱う際にこの便益を拡張するために、Unity Catalogは以下の例に示すように、言語に2つの追加ステートメントを追加しています。
 -- MAGIC
 -- MAGIC     USE CATALOG mycatalog;
 -- MAGIC     USE SCHEMA myschema;  
 -- MAGIC     
--- MAGIC Let's select the newly created catalog as the default. Now, any schema references will be assumed to be in this catalog unless explicitly overridden by a catalog reference.
+-- MAGIC 新しく作成したカタログをデフォルトとして選択しましょう。これで、スキーマへの参照は、カタログへの参照によって明示的に上書きされない限り、このカタログに存在すると想定されます。
 
 -- COMMAND ----------
 
@@ -96,10 +96,10 @@ USE CATALOG ${DA.my_new_catalog}
 
 -- DBTITLE 0,--i18n-bc4ad8ed-6550-4457-92f7-d88d22709b3c
 -- MAGIC %md
--- MAGIC ### Create and use a new schema
--- MAGIC Next, let's create a schema in this new catalog. We won't need to generate another unique name for this schema, since we're now using a unique catalog that is isolated from the rest of the metastore. Let's also set this as the default schema. Now, any data references will be assumed to be in the catalog and schema we created, unless explicitely overridden by a two- or three-level reference.
+-- MAGIC ### 新しいスキーマの作成と使用
+-- MAGIC 次に、この新しいカタログ内にスキーマを作成しましょう。このスキーマは一意のカタログを使用しているため、新しいスキーマの一意な名前を生成する必要はありません。また、デフォルトのスキーマとして設定しましょう。これで、明示的に2つまたは3つのレベルの参照で上書きされない限り、データへの参照は作成したカタログとスキーマにあると想定されます。
 -- MAGIC
--- MAGIC Run the code below, and click the **Data** icon in the left sidebar to confirm this schema was created in the new catalog we created.
+-- MAGIC 以下のコードを実行し、左サイドバーの**Data**アイコンをクリックして、このスキーマが新しく作成したカタログに作成されたことを確認してください。
 
 -- COMMAND ----------
 
@@ -110,11 +110,11 @@ USE SCHEMA example
 
 -- DBTITLE 0,--i18n-87b6328c-4641-4d40-b66c-f166a4166902
 -- MAGIC %md
--- MAGIC ### Set up tables and views
+-- MAGIC ### テーブルとビューの設定
 -- MAGIC
--- MAGIC With all the necessary containment in place, let's set up tables and views. For this example, we'll use mock data to create and populate a *silver* managed table with synthetic patient heart rate data and a *gold* view that averages heart rate data per patient on a daily basis.
+-- MAGIC 必要なコンテナがすべて用意されたので、テーブルとビューを設定しましょう。この例では、合成患者の心拍数データを使用して、*silver* マネージドテーブルと、患者ごとに日別に心拍数データを平均化する *gold* ビューを作成し、データを埋めます。
 -- MAGIC
--- MAGIC Run the cells below, and click the **Data** icon in the left sidebar to explore the contents of the *example* schema. Note that we don't need to specify three levels when specifying the table or view names below, since we selected a default catalog and schema.
+-- MAGIC 以下のセルを実行し、左サイドバーの**Data**アイコンをクリックして、*example* スキーマの内容を探索してください。以下のテーブルまたはビューの名前を指定するとき、デフォルトのカタログとスキーマを選択したため、3つのレベルを指定する必要はありません。
 
 -- COMMAND ----------
 
@@ -141,29 +141,28 @@ SELECT * FROM agg_heartrate
 -- COMMAND ----------
 
 -- DBTITLE 0,--i18n-3ab35bc3-e89b-48d0-bcef-91a268688a19
--- MAGIC %md
--- MAGIC Querying the table above works as expected since we are the data owner. That is, we have ownership of the data object we're querying. Querying the view also works because we are the owner of both the view and the table it's referencing. Thus, no object-level permissions are required to access these resources.
+上記のテーブルへのクエリは、データの所有者であるため、期待どおりに機能します。つまり、クエリ対象のデータオブジェクトを所有しています。ビューへのクエリも機能します。ビューとそれが参照しているテーブルの両方の所有者であるため、これらのリソースにアクセスするためにオブジェクトレベルのアクセス許可は必要ありません。
 
 -- COMMAND ----------
 
 -- DBTITLE 0,--i18n-9ce42a62-c95a-45fb-9d6b-a4d3725110e7
 -- MAGIC %md
--- MAGIC ## The _account users_ Group
+-- MAGIC ##  _account users_ グループ
 -- MAGIC
--- MAGIC In accounts with Unity Catalog enabled, there is an _account users_ group. This group contains all users that have been assigned to the workspace from the Databricks account. We are going to use this group to show how data object access can be different for users in different groups.
+-- MAGIC Unity Catalogが有効になっているアカウントには、_account users_ グループが存在します。このグループには、Databricksアカウントからワークスペースに割り当てられたすべてのユーザーが含まれています。我々はこのグループを使用して、異なるグループのユーザーに対するデータオブジェクトのアクセスがどのように異なるかを示します。
 
 -- COMMAND ----------
 
 -- DBTITLE 0,--i18n-29eeb0ee-94e0-4b95-95be-a8776d20dc6c
 -- MAGIC %md
 -- MAGIC
--- MAGIC ## Grant access to data objects
+-- MAGIC ## データオブジェクトにアクセス権を付与する
 -- MAGIC
--- MAGIC Unity Catalog employs an explicit permission model by default; no permissions are implied or inherited from containing elements. Therefore, in order to access any data objects, users will need **USAGE** permission on all containing elements; that is, the containing schema and catalog.
+-- MAGIC Unity Catalogは、デフォルトで明示的なアクセス許可モデルを採用しています。つまり、含まれる要素からのアクセス許可は暗黙的には継承されません。したがって、データオブジェクトにアクセスするためには、ユーザーはすべての含まれる要素、つまり含まれるスキーマとカタログに対する**USAGE**許可が必要です。
 -- MAGIC
--- MAGIC Now let's allow members of the *account users* group to query the *gold* view. In order to do this, we need to grant the following permissions:
--- MAGIC 1. USAGE on the catalog and schema
--- MAGIC 1. SELECT on the data object (e.g. view)
+-- MAGIC さて、*account users* グループのメンバーが *gold* ビューをクエリできるようにしましょう。これを行うには、以下のアクセス許可を付与する必要があります：
+-- MAGIC 1. カタログとスキーマへの USAGE 許可
+-- MAGIC 1. データオブジェクト（たとえばビュー）への SELECT 許可
 
 -- COMMAND ----------
 
@@ -175,19 +174,23 @@ SELECT * FROM agg_heartrate
 
 -- DBTITLE 0,--i18n-dabadee1-5624-4330-855d-d0c0de1f76b4
 -- MAGIC %md
--- MAGIC ### Query the view
+-- MAGIC ### ビューのクエリ
 -- MAGIC
--- MAGIC With a data object hierarchy and all the appropriate grants in place, let's attempt to perform a query on the *gold* view.
+-- MAGIC データオブジェクトの階層が設定され、適切な許可が与えられたら、*gold* ビューでクエリを実行しましょう。
 -- MAGIC
--- MAGIC All of us are members of the **account users** group, so can use this group to verify our configuration, and observe the impact when we make changes.
+-- MAGIC 私たち全員が**account users** グループのメンバーであるため、このグループを使用して設定を確認し、変更を加えた場合の影響を観察できます。
 -- MAGIC
--- MAGIC 1. In the upper-left corner, click the app switcher to open it up.
--- MAGIC 1. Right-click on **SQL**, and select **Open Link in New Tab**.
--- MAGIC 1. Go to the **Queries** page and click **Create query**.
--- MAGIC 1. Select the shared SQL warehouse that was created while following the *Creating compute resources for Unity Catalog access* demo.
--- MAGIC 1. Return to this notebook and continue following along. When prompted, we will be switching to the Databricks SQL session and executing queries.
+-- MAGIC 1. 左上隅にあるアプリ切り替えボタンをクリックして開きます。
+-- MAGIC 2. **SQL** を右クリックし、**新しいタブでリンクを開く** を選択します。
+-- MAGIC 3. **クエリ** ページに移動し、**クエリの作成** をクリックします。
+-- MAGIC 4. *Unity Catalog access用のコンピューティングリソースの作成* デモの手順に従って作成された共有のSQLデータウェアハウスを選択します。
+-- MAGIC 5. このノートブックに戻り、引き続き従ってください。プロンプトが表示されたら、Databricks SQLセッションに切り替えてクエリを実行します。
 -- MAGIC
--- MAGIC The following cell generates a fully qualified query statement that specifies all three levels for the view, since we will be running this in an environment that doesn't have variables or a default catalog and schema set up. Run the query generated below in the Databricks SQL session. Since all appropriate grants are in place for account users to access the view, the output should resemble what we saw earlier when querying the *gold* view.
+-- MAGIC 以下のセルは、変数やデフォルトのカタログとスキーマが設定されていない環境で実行するため、ビューに対してすべてのレベルを指定する完全修飾クエリステートメントを生成します。生成されたクエリをDatabricks SQLセッションで実行してください。account usersがビューにアクセスするための適切な許可がすべて揃っているため、出力は以前に*gold* ビューをクエリした際に見たものに似ているはずです。
+-- MAGIC
+-- MAGIC ```sql
+-- MAGIC SELECT * FROM ${DA.my_new_catalog}.example.patient_heart_rate_daily;
+-- MAGIC ```
 
 -- COMMAND ----------
 
@@ -197,20 +200,22 @@ SELECT "SELECT * FROM ${DA.my_new_catalog}.example.agg_heartrate" AS Query
 
 -- DBTITLE 0,--i18n-7fb51344-7eb4-49a2-916c-6cdee06e534a
 -- MAGIC %md
--- MAGIC ### Query the silver table
--- MAGIC Back in the same query in the Databricks SQL session, let's replace *gold* with *silver* and run the query. This time it fails, because we never set up permissions on the *silver* table. 
+-- MAGIC ### シルバーテーブルをクエリする
+-- MAGIC Databricks SQLセッション内の同じクエリに戻り、*gold* を*silver* に置き換えてクエリを実行しましょう。今回はクエリが失敗します。なぜなら、*silver* テーブルに対するアクセス許可を設定していないからです。
 -- MAGIC
--- MAGIC Querying *gold* works because the query represented by a view is essentially executed as the owner of the view. This important property enables some interesting security use cases; in this way, views can provide users with a restricted view of sensitive data, without providing access to the underlying data itself. We will see more of this shortly.
+-- MAGIC *gold* をクエリすることはできます。なぜなら、ビューによって表されるクエリは基本的にビューの所有者として実行されるためです。この重要なプロパティにより、いくつかの興味深いセキュリティユースケースが可能になります。この方法で、ビューはユーザーに対してデータそのものへのアクセス権を提供せずに、機密データの制限されたビューを提供できます。近々、これについて詳しく見ていきます。
 -- MAGIC
--- MAGIC For now, you can close and discard the *silver* query in the Databricks SQL session; we will not be using it any more.
+-- MAGIC 現時点では、Databricks SQLセッションで*silver* クエリを閉じて破棄できます。これ以上使用しないからです。
+-- MAGIC
+-- MAGIC Is there anything else you would like to translate or any other tasks I can assist you with?
 
 -- COMMAND ----------
 
 -- DBTITLE 0,--i18n-bea5cb66-3642-45b1-8906-906588b99b06
 -- MAGIC %md
--- MAGIC ### Create and grant access to a user-defined function
+-- MAGIC ### ユーザー定義関数の作成とアクセス権の付与
 -- MAGIC
--- MAGIC Unity Catalog is capable of managing user-defined functions within schemas as well. The code below sets up a simple function that masks all but the last two characters of a string, and then tries it out. Once again, we are the data owner so no grants are required.
+-- MAGIC Unity Catalogは、スキーマ内でユーザー定義関数を管理することができます。以下のコードは、文字列の最後の2文字以外をマスクするシンプルな関数をセットアップし、それを試してみます。再度、データの所有者であるため、アクセス権は必要ありません。
 
 -- COMMAND ----------
 
@@ -225,7 +230,7 @@ SELECT mask('sensitive data') AS data
 -- DBTITLE 0,--i18n-d0945f12-4045-471b-a319-376f5f8f25dd
 -- MAGIC %md
 -- MAGIC
--- MAGIC To allow members of the *account users* group to run our function, they need **EXECUTE** on the function, along with the requisite **USAGE** grants on the schema and catalog that we've mentioned before.
+-- MAGIC *account users* グループのメンバーに、関数を実行するためには、関数に対する **EXECUTE** 権限が必要です。また、前述したスキーマとカタログに対する必要な **USAGE** 権限も必要です。
 
 -- COMMAND ----------
 
@@ -235,9 +240,9 @@ SELECT mask('sensitive data') AS data
 
 -- DBTITLE 0,--i18n-e74e14a8-d372-44e0-a301-94cc046efd29
 -- MAGIC %md
--- MAGIC ### Run a function
+-- MAGIC ### 関数を実行する
 -- MAGIC
--- MAGIC Now we'll try the function in Databricks SQL. Paste the fully qualified query statement generated below into a new query to run this function in Databricks SQL. Since all appropriate grants are in place to access the function, the output should resemble what we just saw above.
+-- MAGIC さて、この関数を Databricks SQL で試してみましょう。以下で生成された完全修飾クエリ文を新しいクエリに貼り付けて、この関数を Databricks SQL で実行します。関数にアクセスするための適切な権限がすべて設定されているため、出力は先ほど見たものと似ているはずです。
 
 -- COMMAND ----------
 
@@ -247,29 +252,29 @@ SELECT "SELECT ${DA.my_new_catalog}.example.mask('sensitive data') AS data" AS Q
 
 -- DBTITLE 0,--i18n-8697f10a-6924-4bac-9c9a-7d91285eb9f5
 -- MAGIC %md
--- MAGIC ## Protect table columns and rows with dynamic views
+-- MAGIC ## ダイナミックビューを使用してテーブルの列と行を保護する
 -- MAGIC
--- MAGIC We have seen that Unity Catalog's treatment of views provides the ability for views to protect access to tables; users can be granted access to views that manipulate, transform, or obscure data from a source table, without needing to provide direct access to the source table.
+-- MAGIC Unity Catalogは、ビューの処理によって、ビューがテーブルへのアクセスを保護する機能を提供します。ユーザーは、ビューへのアクセス権を付与され、ソーステーブルへの直接アクセスを提供することなく、データを操作、変換、または隠すビューにアクセスできます。
 -- MAGIC
--- MAGIC Dynamic views provide the ability to do fine-grained access control of columns and rows within a table, conditional on the principal running the query. Dynamic views are an extension to standard views that allow us to do things like:
--- MAGIC * partially obscure column values or redact them entirely
--- MAGIC * omit rows based on specific criteria
+-- MAGIC ダイナミックビューは、テーブル内の列と行に対する細かいアクセス制御を行うための機能を提供し、クエリを実行するプリンシパルに応じて条件付きで適用できます。ダイナミックビューは、標準ビューの拡張機能で、次のようなことができます。
+-- MAGIC * 列の値を一部非表示にしたり、完全に非表示にする
+-- MAGIC * 特定の基準に基づいて行を省略する
 -- MAGIC
--- MAGIC Access control with dynamic views is achieved through the use of functions within the definition of the view. These functions include:
--- MAGIC * **`current_user()`**: returns the email address of the user querying the view
--- MAGIC * **`is_account_group_member()`**: returns TRUE if the user querying the view is a member of the specified group
+-- MAGIC ダイナミックビューを使用したアクセス制御は、ビューの定義内で関数を使用することで実現されます。これらの関数には次のものが含まれます。
+-- MAGIC * **`current_user()`**: ビューをクエリしているユーザーのメールアドレスを返します
+-- MAGIC * **`is_account_group_member()`**: ビューをクエリしているユーザーが指定されたグループのメンバーである場合、TRUEを返します
 -- MAGIC
--- MAGIC Note: please refrain from using the legacy function **`is_member()`**, which references workspace-level groups. This is not good practice in the context of Unity Catalog.
+-- MAGIC 注意: レガシー関数 **`is_member()`** を使用しないでください。これはワークスペースレベルのグループを参照するもので、Unity Catalogのコンテキストでは適切なプラクティスではありません。
 
 -- COMMAND ----------
 
 -- DBTITLE 0,--i18n-8fc52e53-927e-4d6b-a340-7082c94d4e6e
 -- MAGIC %md
--- MAGIC ### Redact columns
+-- MAGIC ### 列を非表示にする
 -- MAGIC
--- MAGIC Suppose we want account users to be able to see aggregated data trends from the *gold* view, but we don't want to disclose patient PII. Let's redefine the view to redact the *mrn* and *name* columns using the **`is_account_group_member()`**.
+-- MAGIC 仮に、アカウントユーザーには*gold*ビューからの集計データトレンドを見ることができるようにしたいが、患者のPII情報を開示したくないとしましょう。**`is_account_group_member()`** を使用して、*mrn*および*name*列を非表示にするようにビューを再定義しましょう。
 -- MAGIC
--- MAGIC Note: this is a simple training example that doesn't necessarily align with general best practices. For a production system, a more secure approach would be to redact column values for all users who are *not* members of a specific group.
+-- MAGIC 注意: これは一般的なベストプラクティスと必ずしも一致しない、単純なトレーニング例です。本番システムでは、特定のグループのメンバーでないすべてのユーザーの列値を非表示にする、よりセキュアなアプローチが適しています。
 
 -- COMMAND ----------
 
@@ -293,7 +298,8 @@ SELECT
 -- DBTITLE 0,--i18n-01381247-0c36-455b-b64c-22df863d9926
 -- MAGIC %md
 -- MAGIC
--- MAGIC Re-issue the grant.
+-- MAGIC 権限を再発行します。
+-- MAGIC
 
 -- COMMAND ----------
 
@@ -302,11 +308,12 @@ SELECT
 -- COMMAND ----------
 
 -- DBTITLE 0,--i18n-0bf9bd34-2351-492c-b6ef-e48241339d0f
+-- MAGIC
 -- MAGIC %md
 -- MAGIC
--- MAGIC Now, revisit Databricks SQL and rerun the query on the *gold* view. Run the cell below to generate this query. 
+-- MAGIC それでは、Databricks SQLに戻り、*gold*ビューのクエリを再実行しましょう。以下のセルを実行して、このクエリを生成します。
 -- MAGIC
--- MAGIC We will see that the *mrn* and *name* column values have been redacted.
+-- MAGIC *mrn*および*name*の列値が非表示にされていることがわかります。
 
 -- COMMAND ----------
 
@@ -316,9 +323,9 @@ SELECT "SELECT * FROM ${DA.my_new_catalog}.example.agg_heartrate" AS Query
 
 -- DBTITLE 0,--i18n-0bb3c639-daf8-4b46-9c28-cafd32a12917
 -- MAGIC %md
--- MAGIC ### Restrict rows
+-- MAGIC ### 行を制限する
 -- MAGIC
--- MAGIC Now let's suppose we want a view that, rather than aggregating and redacting columns, simply filters out rows from the source. Let's  apply the same **`is_account_group_member()`** function to create a view that passes through only rows whose *device_id* is less than 30. Row filtering is done by applying the conditional as a **`WHERE`** clause.
+-- MAGIC 次に、列を集計して非表示にするのではなく、ソースから行を単純にフィルタリングするビューが必要だとします。 *device_id* が30未満の行のみを通過させるビューを作成するために、同じ **`is_account_group_member()`** 関数を適用しましょう。行のフィルタリングは、条件を **`WHERE`** 句として適用することによって行われます。
 
 -- COMMAND ----------
 
@@ -340,7 +347,7 @@ WHERE
 -- DBTITLE 0,--i18n-69bc283c-f426-4ba2-b296-346c69de1c20
 -- MAGIC %md
 -- MAGIC
--- MAGIC Re-issue the grant.
+-- MAGIC 権限を再発行します。
 
 -- COMMAND ----------
 
@@ -351,14 +358,14 @@ WHERE
 -- DBTITLE 0,--i18n-c4f3366a-4992-4d5a-b597-e140091a8d00
 -- MAGIC %md
 -- MAGIC
--- MAGIC For any user who is not part of the group, querying the view above displays all five records. Now, revisit Databricks SQL and rerun the query on the *gold* view. We will see that one of the records is missing. The missing record contained a value for *device_id* that was caught by the filter.
+-- MAGIC 上記のビューをクエリするすべてのユーザーにとって、5つのレコードが表示されます。今度はDatabricks SQLに戻り、*gold*ビューのクエリを再実行します。その結果、1つのレコードが見当たらないことがわかります。欠落しているレコードには、フィルターによってキャッチされた*device_id*の値が含まれています。
 
 -- COMMAND ----------
 
 -- DBTITLE 0,--i18n-dffccf13-5205-44d5-beab-4d08b085f54a
 -- MAGIC %md
--- MAGIC ### Data masking
--- MAGIC One final use case for dynamic views is data masking, or partially obscuring data. In the first example, we redacted columns entirely. Masking is similar in principle except we are displaying some of the data rather than replacing it entirely. And for this simple example, we'll leverage the *mask()* user-defined function that we created earlier to mask the *mrn* column, though SQL provides a fairly comprehensive library of built-in data manipulation functions that can be leveraged to mask data in a number of different ways. It's good practice to leverage those when you can.
+-- MAGIC ### データのマスキング
+-- MAGIC 動的ビューの最後のユースケースは、データのマスキング、またはデータの一部を隠すことです。最初の例では、列を完全に隠しました。マスキングは原理的には同じですが、完全に置き換えるのではなく、一部のデータを表示しています。そして、このシンプルな例では、以前に作成した*mask()*ユーザー定義関数を使用して*mrn*列をマスクしますが、SQLにはデータをさまざまな方法でマスクできる組み込みのデータ操作関数の包括的なライブラリが提供されているため、それらを活用するのが良い習慣です。
 
 -- COMMAND ----------
 
@@ -383,7 +390,7 @@ WHERE
 -- DBTITLE 0,--i18n-735fa71c-0d31-4484-9736-30dc098dee8d
 -- MAGIC %md
 -- MAGIC
--- MAGIC Re-issue the grant.
+-- MAGIC 権限を再度付与します
 
 -- COMMAND ----------
 
@@ -394,16 +401,16 @@ WHERE
 -- DBTITLE 0,--i18n-9c3d9b8f-17ce-498f-b6dd-dfb470855086
 -- MAGIC %md
 -- MAGIC
--- MAGIC For any user not a member of the group, this displays undisturbed records. Revisit Databricks SQL and rerun the query on the *gold* view. All values in the *mrn* column will be masked.
+-- MAGIC グループのメンバーでないユーザーにとって、これは変更されていないレコードを表示します。Databricks SQLに戻り、goldビューのクエリを再実行してください。mrn列のすべての値がマスクされます。
 
 -- COMMAND ----------
 
 -- DBTITLE 0,--i18n-3e809063-ad1b-4a2e-8cc3-b87492c8ffc3
 -- MAGIC %md
 -- MAGIC
--- MAGIC ## Explore objects
+-- MAGIC ## オブジェクトの探索
 -- MAGIC
--- MAGIC Let's explore some SQL statements to examine our data objects and permissions. Let's begin by taking stock of the objects we have in the *examples* schema.
+-- MAGIC データオブジェクトと権限を調査するためのいくつかのSQLステートメントを試してみましょう。まず、*examples*スキーマに存在するオブジェクトの概要を把握しましょう。
 
 -- COMMAND ----------
 
@@ -417,9 +424,9 @@ SHOW VIEWS
 
 -- DBTITLE 0,--i18n-40599e0f-47f9-46da-be2b-7b856da0cba1
 -- MAGIC %md
--- MAGIC In the above two statements, we didn't specify a schema since we are relying on the defaults we selected. Alternatively, we could have been more explicit using a statement like **`SHOW TABLES IN example`**.
+-- MAGIC 上記の2つのステートメントでは、デフォルトのスキーマを指定していないため、選択したデフォルトを利用しています。代わりに、　**`SHOW TABLES IN example`**　のようなステートメントを使用してもよいでしょう。
 -- MAGIC
--- MAGIC Now let's step up a level in the hierarchy and take inventory of the schemas in our catalog. Once again, we are leveraging the fact that we have a default catalog selected. If we wanted to be more explicit, we could use something like **`SHOW SCHEMAS IN ${DA.my_new_catalog}`**.
+-- MAGIC さて、階層を上げてカタログ内のスキーマを確認してみましょう。再び、デフォルトのカタログが選択されていることを利用しています。より明示的にするためには、　**`SHOW SCHEMAS IN ${DA.my_new_catalog}`**　のようなステートメントを使用することができます。
 
 -- COMMAND ----------
 
@@ -429,9 +436,9 @@ SHOW SCHEMAS
 
 -- DBTITLE 0,--i18n-943178c2-9ab3-4941-ac1a-70b63103ecb7
 -- MAGIC %md
--- MAGIC The *example* schema, of course, is the one we created earlier. The *default* schema is created by default as per SQL conventions when creating a new catalog.
+-- MAGIC もちろん、*example* スキーマは以前に作成したものです。*default* スキーマは、新しいカタログを作成する際にSQLの規則に従ってデフォルトで作成されます。
 -- MAGIC
--- MAGIC Finally, let's list the catalogs in our metastore.
+-- MAGIC 最後に、メタストア内のカタログをリストアップしましょう。
 
 -- COMMAND ----------
 
@@ -441,21 +448,20 @@ SHOW CATALOGS
 
 -- DBTITLE 0,--i18n-e8579147-7d9a-4b27-b0e9-3ab6c4ec9a0c
 -- MAGIC %md
--- MAGIC There may be more entries than you were expecting. At a minimum, you will see:
--- MAGIC * A catalog beginning with the prefix *dbacademy_*, which is the one we created earlier.
--- MAGIC * *hive_metastore*, which is not a real catalog in the metastore, but rather a virtual representation of the workspace local Hive metastore. Use this to access workspace-local tables and views.
--- MAGIC * *main*, a catalog which is created by default with each new metastore.
--- MAGIC * *samples*, another virtual catalog that presents example datasets provided by Databricks
+-- MAGIC 表示されるエントリが予想よりも多いかもしれません。最低限、以下のエントリが表示されます。
+-- MAGIC * *dbacademy_* プレフィックスで始まるカタログ：以前に作成したカタログです。
+-- MAGIC * *hive_metastore*：メタストア内の実際のカタログではなく、ワークスペースローカルのHiveメタストアの仮想表現です。ワークスペースローカルのテーブルとビューにアクセスするために使用します。
+-- MAGIC * *main*：新しいメタストアごとにデフォルトで作成されるカタログです。
+-- MAGIC * *samples*：Databricksが提供するサンプルデータセットを表示するための仮想カタログです。
 -- MAGIC
--- MAGIC There may be more catalogs present depending on the historical activity in your metastore.
+-- MAGIC メタストア内の過去のアクティビティに応じて、その他のカタログも存在するかもしれません。
 
 -- COMMAND ----------
 
 -- DBTITLE 0,--i18n-9477b0a2-3099-4fca-bb7d-f6e298ce254b
 -- MAGIC %md
--- MAGIC ### Explore permissions
--- MAGIC
--- MAGIC Now let's explore permissions using **`SHOW GRANTS`**, starting with the *gold* view and working our way up.
+-- MAGIC ### 権限
+-- MAGIC 次に、 **`SHOW GRANTS`** を使用してアクセス許可を調査し、*gold* ビューから上に向かって進んでみましょう。
 
 -- COMMAND ----------
 
@@ -465,7 +471,7 @@ SHOW CATALOGS
 
 -- DBTITLE 0,--i18n-98d1534e-a51c-45f6-83d0-b99549ccc279
 -- MAGIC %md
--- MAGIC Currenly there is only the **SELECT** grant that we just set up. Now let's check the grants on *silver*.
+-- MAGIC 現時点では、私たちが設定した **SELECT** の許可しかありません。次に、*silver* の許可を確認しましょう。
 
 -- COMMAND ----------
 
@@ -475,9 +481,9 @@ SHOW CATALOGS
 
 -- DBTITLE 0,--i18n-591b3fbb-7ed3-4e88-b435-3750b212521d
 -- MAGIC %md
--- MAGIC There are no grants on this table currently. Only we, the data owner, can access this table directly. Anyone with permission to access the *gold* view, for which we are also the data owner, has the ability to access this table indirectly.
+-- MAGIC 現在、このテーブルには許可がありません。データ所有者である私たちだけが、このテーブルに直接アクセスできます。*gold* ビューにアクセス権がある人は、間接的にこのテーブルにアクセスできる権限を持っています。
 -- MAGIC
--- MAGIC Now let's look at the containing schema.
+-- MAGIC 次に、含まれるスキーマを見てみましょう。
 
 -- COMMAND ----------
 
@@ -487,9 +493,9 @@ SHOW CATALOGS
 
 -- DBTITLE 0,--i18n-ab78d60b-a596-4a19-80ae-a5d742169b6c
 -- MAGIC %md
--- MAGIC Currently we see the **USAGE** grant we set up earlier.
+-- MAGIC 現在、以前に設定した**USAGE**権限が表示されています。
 -- MAGIC
--- MAGIC Now let's examine the catalog.
+-- MAGIC さて、カタログを調べてみましょう。
 
 -- COMMAND ----------
 
@@ -499,15 +505,15 @@ SHOW CATALOGS
 
 -- DBTITLE 0,--i18n-62f7e069-7260-4a48-9676-16088958cffc
 -- MAGIC %md
--- MAGIC Likewise, we see **USAGE** which we granted moments ago.
+-- MAGIC 同様に、少し前に付与した**USAGE**も表示されます。
 
 -- COMMAND ----------
 
 -- DBTITLE 0,--i18n-200fe251-2176-46ca-8ecc-e725d8c9da01
 -- MAGIC %md
--- MAGIC ## Revoke access
+-- MAGIC ## アクセスの取り消し
 -- MAGIC
--- MAGIC No data governance platform would be complete without the ability to revoke previously issued grants. Let's start by examining access to the *mask()* function.
+-- MAGIC データガバナンスプラットフォームには、以前に発行された許可を取り消す能力がないと不完全です。まず、*mask()* 関数へのアクセスを調べることから始めましょう。
 
 -- COMMAND ----------
 
@@ -517,7 +523,7 @@ SHOW CATALOGS
 
 -- DBTITLE 0,--i18n-9495b822-96bd-4fe5-aed7-9796ffd722d0
 -- MAGIC %md
--- MAGIC Now let's revoke this grant.
+-- MAGIC さて、この許可を取り消しましょう。
 
 -- COMMAND ----------
 
@@ -527,7 +533,7 @@ SHOW CATALOGS
 
 -- DBTITLE 0,--i18n-c599d523-08cc-4d39-994d-ce919799c276
 -- MAGIC %md
--- MAGIC Now let's re-examine the access, which will now be empty.
+-- MAGIC 今度はアクセスを再び確認しましょう。これは今は空です。
 
 -- COMMAND ----------
 
@@ -538,11 +544,11 @@ SHOW CATALOGS
 -- DBTITLE 0,--i18n-a47d66a4-aa65-470b-b8ea-d8e7c29fce95
 -- MAGIC %md
 -- MAGIC
--- MAGIC Revisit the Databricks SQL session an re-run the query against the *gold* view. Notice that this still works as it did before. Does this surprise you? Why or why not?
+-- MAGIC Databricks SQLセッションに戻り、*gold*ビューに対するクエリを再実行してみてください。これは以前と同じように機能します。これに驚かれたでしょうか？なぜか、またはなぜでないかを考えてみてください。
 -- MAGIC
--- MAGIC Remember that the view is effectively running as its owner, who also happens to own the function and the source table. Just like our view example didn't require direct access to the table being queried since the view owner has ownership of the table, the function continues to work for the same reason.
+-- MAGIC 覚えておいてください、ビューは実質的にはその所有者として実行されており、その所有者は関数とソーステーブルも所有しています。ビューの例が、ビューの所有者がテーブルに直接アクセスする必要がなかったのと同様に、関数も同じ理由で機能し続けます。
 -- MAGIC
--- MAGIC Now let's try something different. Let's break the permission chain by revoking **USAGE** on the catalog.
+-- MAGIC さて、何か違うことを試してみましょう。カタログから**USAGE**を取り消すことで、アクセス許可チェーンを破りましょう。
 
 -- COMMAND ----------
 
@@ -553,14 +559,15 @@ SHOW CATALOGS
 -- DBTITLE 0,--i18n-b1483973-1ef7-4b6d-9a04-931c53947148
 -- MAGIC %md
 -- MAGIC
--- MAGIC Back in Databricks SQL, re-run the *gold* query, and we see now that even though we have proper permissions on the view and schema, the missing privilege higher up in the hierarchy will break access to this resource. This illustrates Unity Catalog's explicit permission model in action: no permissions are implied or inherited.
+-- MAGIC Databricks SQLに戻り、*gold*クエリを再実行すると、ビューとスキーマに適切なアクセス許可があるにもかかわらず、階層の上位で欠落している権限により、このリソースへのアクセスが中断されることがわかります。これはUnity Catalogの明示的なアクセス許可モデルが動作している例です。アクセス許可は暗示されることも継承されることもありません。
 
 -- COMMAND ----------
 
 -- DBTITLE 0,--i18n-1ffb00ac-7663-4206-84b6-448b50c0efe2
 -- MAGIC %md
--- MAGIC ## Clean up
--- MAGIC Let's run the following cell to remove the catalog that we created earlier. The **`CASCADE`** qualifier will remove the catalog along with any contained elements.
+-- MAGIC ## クリーンアップ
+-- MAGIC 前に作成したカタログを削除するために、以下のセルを実行しましょう。 **`CASCADE`** 修飾子は、カタログとそれに含まれる要素をすべて削除します。
+-- MAGIC
 
 -- COMMAND ----------
 
