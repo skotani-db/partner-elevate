@@ -10,75 +10,51 @@
 # DBTITLE 0,--i18n-2396d183-ba9d-4477-a92a-690506110da6
 # MAGIC %md
 # MAGIC
+# MAGIC # Databricks SQLのナビゲーションとSQL Warehouseへのアタッチ
 # MAGIC
-# MAGIC # Navigating Databricks SQL and Attaching to SQL Warehouses
+# MAGIC * Databricks SQLに移動します
+# MAGIC   * サイドバーのワークスペースオプションからSQLが選択されていることを確認します（Databricksのロゴの直下にあります）
+# MAGIC * SQL Warehouseがオンでアクセス可能であることを確認します
+# MAGIC   * サイドバーでSQL Warehouseに移動します
+# MAGIC   * SQL Warehouseが存在し、状態が **`Running`** であれば、このSQL Warehouseを使用します
+# MAGIC   * SQL Warehouseが存在し、 **`Stopped`** であれば、このオプションがある場合には **`Start`** ボタンをクリックします（ **注意** ：利用可能な最小のSQL Warehouseを起動します）
+# MAGIC   * SQL Warehouseが存在せず、オプションがある場合は、 **`Create SQL Warehouse`** をクリックし、SQL Warehouseの名前を識別できるものに設定し、クラスターサイズを2X-Smallに設定します。他のオプションはデフォルトのままにします。
+# MAGIC   * SQL Warehouseを作成またはアタッチする方法がない場合は、Databricks SQLで計算リソースへのアクセスをリクエストするためにワークスペース管理者に連絡する必要があります。
+# MAGIC * Databricks SQLのホームページに移動します
+# MAGIC   * サイドナビゲーションバーの上部にあるDatabricksロゴをクリックします
+# MAGIC * **Sample dashboards** を探して **`Visit gallery`** をクリックします
+# MAGIC * **Retail Revenue & Supply Chain** の横にある **`Import`** をクリックします
+# MAGIC   * 利用可能なSQL Warehouseがあると仮定して、これによりダッシュボードが読み込まれ、すぐに結果が表示されるはずです
+# MAGIC   * 右上の **Refresh** をクリックします（基本データは変更されていませんが、変更を取り込むために使用されるボタンです）
 # MAGIC
-# MAGIC * Navigate to Databricks SQL  
-# MAGIC   * Make sure that SQL is selected from the workspace option in the sidebar (directly below the Databricks logo)
-# MAGIC * Make sure a SQL warehouse is on and accessible
-# MAGIC   * Navigate to SQL Warehouses in the sidebar
-# MAGIC   * If a SQL warehouse exists and has the State **`Running`**, you'll use this SQL warehouse
-# MAGIC   * If a SQL warehouse exists but is **`Stopped`**, click the **`Start`** button if you have this option (**NOTE**: Start the smallest SQL warehouse you have available to you) 
-# MAGIC   * If no SQL warehouses exist and you have the option, click **`Create SQL Warehouse`**; name the SQL warehouse something you'll recognize and set the cluster size to 2X-Small. Leave all other options as default.
-# MAGIC   * If you have no way to create or attach to a SQL warehouse, you'll need to contact a workspace administrator and request access to compute resources in Databricks SQL to continue.
-# MAGIC * Navigate to home page in Databricks SQL
-# MAGIC   * Click the Databricks logo at the top of the side nav bar
-# MAGIC * Locate the **Sample dashboards** and click **`Visit gallery`**
-# MAGIC * Click **`Import`** next to the **Retail Revenue & Supply Chain** option
-# MAGIC   * Assuming you have a SQL warehouse available, this should load a dashboard and immediately display results
-# MAGIC   * Click **Refresh** in the top right (the underlying data has not changed, but this is the button that would be used to pick up changes)
+# MAGIC # DBSQLダッシュボードの更新
 # MAGIC
-# MAGIC # Updating a DBSQL Dashboard
+# MAGIC * サイドバーのナビゲーターを使用して**Dashboards**を見つけます
+# MAGIC   * あなたが読み込んだばかりのサンプルダッシュボードを見つけます。これは **Retail Revenue & Supply Chain** と呼ばれ、 **`Created By`** フィールドにあなたのユーザー名が表示されているはずです。 **注意** ：右側の **My Dashboards** オプションは、ワークスペース内の他のダッシュボードをフィルタリングするのに役立ちます
+# MAGIC   * ダッシュボード名をクリックして表示します
+# MAGIC * **Shifts in Pricing Priorities** プロットの背後にあるクエリを表示します
+# MAGIC   * プロットの上にカーソルを合わせると、3つの垂直ドットが表示されます。これをクリックします
+# MAGIC   * メニューから **View Query** を選択します
+# MAGIC * このプロットをポップアップするSQLコードを確認します
+# MAGIC   * ソーステーブルを識別するために3階層の名前空間が使用されていることに注意してください。これはUnity Catalogでサポートされる新しい機能のプレビューです
+# MAGIC   * 画面の右上にある **`Run`** をクリックしてクエリの結果をプレビューします
+# MAGIC * ビジュアライゼーションを確認します
+# MAGIC   * クエリの下には **Table** というタブが選択されているはずです。 **Price by Priority over Time** をクリックしてプロットのプレビューに切り替えます
+# MAGIC   * 画面の下部にある **Edit Visualization** をクリックして設定を確認します
+# MAGIC   * 設定を変更すると、ビジュアライゼーションにどのように影響するかを探索します
+# MAGIC   * 変更を適用する場合は **Save** をクリックし、それ以外の場合は **Cancel** をクリックします
+# MAGIC * クエリエディタに戻り、ビジュアライゼーション名の右側にある **Add Visualization** ボタンをクリックします
+# MAGIC   * バーグラフを作成します
+# MAGIC   * **X Column** を **`Date`** に設定します
+# MAGIC   * **Y Column** を **`Total Price`** に設定します
+# MAGIC   * **Group by** を **`Priority`** に設定します
+# MAGIC   * **Stacking** を **`Stack`** に設定します
+# MAGIC   * 他のすべての設定をデフォルトのままにします
+# MAGIC   * **Save** をクリックします
+# MAGIC * クエリエディタに戻り、このビジュアライゼーションのデフォルトの名前をクリックして編集し、ビジュアライゼーション名を **`Stacked Price`** に変更します
+# MAGIC * 画面の下部で、 **`Edit Visualization`** ボタンの左側にある三つの垂直ドットをクリックします
+# MAGIC   * メニューから **Add to Dashboard**
 # MAGIC
-# MAGIC * Use the sidebar navigator to find the **Dashboards**
-# MAGIC   * Locate the sample dashboard you just loaded; it should be called **Retail Revenue & Supply Chain** and have your username under the **`Created By`** field. **NOTE**: the **My Dashboards** option on the right hand side can serve as a shortcut to filter out other dashboards in the workspace
-# MAGIC   * Click on the dashboard name to view it
-# MAGIC * View the query behind the **Shifts in Pricing Priorities** plot
-# MAGIC   * Hover over the plot; three vertical dots should appear. Click on these
-# MAGIC   * Select **View Query** from the menu that appears
-# MAGIC * Review the SQL code used to populate this plot
-# MAGIC   * Note that 3 tier namespacing is used to identify the source table; this is a preview of new functionality to be supported by Unity Catalog
-# MAGIC   * Click **`Run`** in the top right of the screen to preview the results of the query
-# MAGIC * Review the visualization
-# MAGIC   * Under the query, a tab named **Table** should be selected; click **Price by Priority over Time** to switch to a preview of your plot
-# MAGIC   * Click **Edit Visualization** at the bottom of the screen to review settings
-# MAGIC   * Explore how changing settings impacts your visualization
-# MAGIC   * If you wish to apply your changes, click **Save**; otherwise, click **Cancel**
-# MAGIC * Back in the query editor, click the **Add Visualization** button to the right of the visualization name
-# MAGIC   * Create a bar graph
-# MAGIC   * Set the **X Column** as **`Date`**
-# MAGIC   * Set the **Y Column** as **`Total Price`**
-# MAGIC   * **Group by** **`Priority`**
-# MAGIC   * Set **Stacking** to **`Stack`**
-# MAGIC   * Leave all other settings as defaults
-# MAGIC   * Click **Save**
-# MAGIC * Back in the query editor, click the default name for this visualization to edit it; change the visualization name to **`Stacked Price`**
-# MAGIC * Add the bottom of the screen, click the three vertical dots to the left of the **`Edit Visualization`** button
-# MAGIC   * Select **Add to Dashboard** from the menu
-# MAGIC   * Select your **`Retail Revenue & Supply Chain`** dashboard
-# MAGIC * Navigate back to your dashboard to view this change
-# MAGIC
-# MAGIC # Create a New Query
-# MAGIC
-# MAGIC * Use the sidebar to navigate to **Queries**
-# MAGIC * Click the **`Create Query`** button
-# MAGIC * Make sure you are connected to a SQL warehouse. In the **Schema Browser**, click on the current metastore and select **`samples`**. 
-# MAGIC   * Select the **`tpch`** database
-# MAGIC   * Click on the **`partsupp`** table to get a preview of the schema
-# MAGIC   * While hovering over the **`partsupp`** table name, click the **>>** button to insert the table name into your query text
-# MAGIC * Write your first query:
-# MAGIC   * **`SELECT * FROM`** the **`partsupp`** table using the full name imported in the last step; click **Run** to preview results
-# MAGIC   * Modify this query to **`GROUP BY ps_partkey`** and return the **`ps_partkey`** and **`sum(ps_availqty)`**; click **Run** to preview results
-# MAGIC   * Update your query to alias the 2nd column to be named **`total_availqty`** and re-execute the query
-# MAGIC * Save your query
-# MAGIC   * Click the **Save** button next to **Run** near the top right of the screen
-# MAGIC   * Give the query a name you'll remember
-# MAGIC * Add the query to your dashboard
-# MAGIC   * Click the three vertical buttons at the bottom of the screen
-# MAGIC   * Click **Add to Dashboard**
-# MAGIC   * Select your **`Retail Revenue & Supply Chain`** dashboard
-# MAGIC * Navigate back to your dashboard to view this change
-# MAGIC   * If you wish to change the organization of visualizations, click the three vertical buttons in the top right of the screen; click **Edit** in the menu that appears and you'll be able to drag and resize visualizations
 
 # COMMAND ----------
 

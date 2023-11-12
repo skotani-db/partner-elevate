@@ -10,25 +10,25 @@
 # DBTITLE 0,--i18n-e263b6d4-ac6b-42c3-9c79-086e0881358d
 # MAGIC %md
 # MAGIC ## Databricks SQL
-# MAGIC This module is part of the Data Engineer Learning Path by Databricks Academy.
+# MAGIC このモジュールは、Databricks Academyによるデータエンジニアの学習パスの一部です。
 # MAGIC
-# MAGIC #### Lessons
-# MAGIC [DE 7.1 - Navigating Databricks SQL and Attaching to Warehouses]($./DE 7.1 - Navigating Databricks SQL and Attaching to Warehouses) <br>
-# MAGIC [DE 7.2L - Last Mile ETL with DBSQL]($./DE 7.2L - Last Mile ETL with DBSQL) <br>
+# MAGIC #### レッスン
+# MAGIC [DE 7.1 - Databricks SQLのナビゲーションとWarehouseへのアタッチ]($./DE 7.1 - Databricks SQLのナビゲーションとWarehouseへのアタッチ) <br>
+# MAGIC [DE 7.2L - DBSQLを使用したラストマイルETL]($./DE 7.2L - DBSQLを使用したラストマイルETL) <br>
 # MAGIC
-# MAGIC #### Prerequisites
-# MAGIC * Ability to perform basic code development tasks using the Databricks Data Engineering & Data Science workspace (create clusters, run code in notebooks, use basic notebook operations, import repos from git, etc)
-# MAGIC * Ability to configure and run data pipelines using the Delta Live Tables UI
-# MAGIC * Beginner experience defining Delta Live Tables (DLT) pipelines using PySpark
-# MAGIC * Ingest and process data using Auto Loader and PySpark syntax
-# MAGIC * Process Change Data Capture feeds with APPLY CHANGES INTO syntax
-# MAGIC * Review pipeline event logs and results to troubleshoot DLT syntax
-# MAGIC * Production experience working with data warehouses and data lakes
+# MAGIC #### 必要条件
+# MAGIC * Databricksデータエンジニアリング＆データサイエンスワークスペースで基本的なコード開発タスクを実行できる能力（クラスタの作成、ノートブックでのコード実行、基本的なノートブック操作、gitからのリポジトリのインポートなど）
+# MAGIC * Delta Live Tables UIを使用してデータパイプラインを設定および実行できる能力
+# MAGIC * PySparkを使用してDelta Live Tables（DLT）パイプラインを定義する初心者の経験
+# MAGIC * Auto LoaderおよびPySpark構文を使用してデータを取り込み、処理できる能力
+# MAGIC * APPLY CHANGES INTO構文を使用して変更データキャプチャフィードを処理できる能力
+# MAGIC * DLT構文のトラブルシューティングのためにパイプラインイベントログと結果を確認できる能力
+# MAGIC * データウェアハウスとデータレイクでのプロダクション経験
 # MAGIC
+# MAGIC #### 技術的な注意事項
+# MAGIC * このコースはDBR 11.3で実行されます。
+# MAGIC * このコースはDatabricks Community Editionでは提供できません。
 # MAGIC
-# MAGIC #### Technical Considerations
-# MAGIC * This course runs on DBR 11.3.
-# MAGIC * This course cannot be delivered on Databricks Community Edition.
 
 # COMMAND ----------
 
