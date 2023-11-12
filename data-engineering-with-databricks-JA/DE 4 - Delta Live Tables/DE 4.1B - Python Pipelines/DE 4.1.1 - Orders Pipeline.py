@@ -9,55 +9,55 @@
 
 # DBTITLE 0,--i18n-8c690200-3a21-4838-8d2a-15385fda557f
 # MAGIC %md
-# MAGIC # Fundamentals of DLT Python Syntax
+# MAGIC # DLT Python構文の基本
 # MAGIC
-# MAGIC This notebook demonstrates using Delta Live Tables (DLT) to process raw data from JSON files landing in cloud object storage through a series of tables to drive analytic workloads in the lakehouse. Here we demonstrate a medallion architecture, where data is incrementally transformed and enriched as it flows through a pipeline. This notebook focuses on the Python syntax of DLT rather than this architecture, but a brief overview of the design:
+# MAGIC このノートブックでは、Delta Live Tables (DLT) を使用して、クラウドオブジェクトストレージに着信したJSONファイルの生データを処理し、データレイクハウスで分析ワークロードを実行する方法を示します。ここでは、メダリオンアーキテクチャを示しており、データがパイプラインを流れるにつれて段階的に変換およびエンリッチされる仕組みです。このノートブックは、このアーキテクチャではなく、DLTのPython構文に焦点を当てていますが、設計の簡単な概要も以下に示します。
 # MAGIC
-# MAGIC * The bronze table contains raw records loaded from JSON enriched with data describing how records were ingested
-# MAGIC * The silver table validates and enriches the fields of interest
-# MAGIC * The gold table contains aggregate data to drive business insights and dashboarding
+# MAGIC * ブロンズテーブルには、JSONから読み込まれた生のレコードが含まれており、レコードの取り込み方法に関するデータでエンリッチされています。
+# MAGIC * シルバーテーブルは、対象のフィールドを検証およびエンリッチします。
+# MAGIC * ゴールドテーブルには、ビジネスインサイトとダッシュボード作成のための集計データが含まれています。
 # MAGIC
-# MAGIC ## Learning Objectives
+# MAGIC ## 学習目標
 # MAGIC
-# MAGIC By the end of this notebook, students should feel comfortable:
-# MAGIC * Declaring Delta Live Tables
-# MAGIC * Ingesting data with Auto Loader
-# MAGIC * Using parameters in DLT Pipelines
-# MAGIC * Enforcing data quality with constraints
-# MAGIC * Adding comments to tables
-# MAGIC * Describing differences in syntax and execution of live tables and streaming live tables
+# MAGIC このノートブックの終わりまでに、学生は以下について快適に感じるはずです：
+# MAGIC * Delta Live Tablesの宣言
+# MAGIC * Auto Loaderを使用してデータを取り込む
+# MAGIC * DLTパイプラインでパラメータを使用する
+# MAGIC * 制約を使用してデータ品質を強化する
+# MAGIC * テーブルにコメントを追加する
+# MAGIC * ライブテーブルとストリーミングライブテーブルの構文と実行の違いを説明する
 
 # COMMAND ----------
 
 # DBTITLE 0,--i18n-c23e126e-c267-4704-bfca-caee48728551
 # MAGIC %md
-# MAGIC ## About DLT Library Notebooks
+# MAGIC ## DLTライブラリノートブックについて
 # MAGIC
-# MAGIC DLT syntax is not intended for interactive execution in a notebook. This notebook will need to be scheduled as part of a DLT pipeline for proper execution. 
+# MAGIC DLT構文はノートブック内での対話的な実行を意図していません。このノートブックは、適切に実行するためにDLTパイプラインの一部としてスケジュールする必要があります。
 # MAGIC
-# MAGIC At the time this notebook was written, the current Databricks runtime does not include the **`dlt`** module, so trying to execute any DLT commands in a notebook will fail. 
+# MAGIC このノートブックが作成された時点では、現在のDatabricksランタイムには **`dlt`** モジュールが含まれていないため、ノートブックでDLTコマンドを実行しようとすると失敗します。
 # MAGIC
-# MAGIC We'll discuss developing and troubleshooting DLT code later in the course.
+# MAGIC DLTコードの開発とトラブルシューティングについては、後のコースで詳しく説明します。
 # MAGIC
-# MAGIC ## Parameterization
+# MAGIC ## パラメータ化
 # MAGIC
-# MAGIC During the configuration of the DLT pipeline, a number of options were specified. One of these was a key-value pair added to the **Configurations** field.
+# MAGIC DLTパイプラインの構成中に、いくつかのオプションが指定されました。そのうちの1つは、**Configurations** フィールドに追加されたキーと値のペアです。
 # MAGIC
-# MAGIC Configurations in DLT pipelines are similar to parameters in Databricks Jobs, but are actually set as Spark configurations.
+# MAGIC DLTパイプラインの構成は、Databricksジョブのパラメータに似ていますが、実際にはSpark設定として設定されています。
 # MAGIC
-# MAGIC In Python, we can access these values using **`spark.conf.get()`**.
+# MAGIC Pythonでは、これらの値には **`spark.conf.get()`** を使用してアクセスできます。
 # MAGIC
-# MAGIC Throughout these lessons, we'll set the Python variable **`source`** early in the notebook and then use this variable as necessary in the code.
+# MAGIC これらのレッスンでは、ノートブックの初めでPython変数 **`source`** を設定し、その後必要に応じてこの変数をコード内で使用します。
 # MAGIC
-# MAGIC ## A Note on Imports
+# MAGIC ## インポートに関する注意
 # MAGIC
-# MAGIC The **`dlt`** module should be explicitly imported into your Python notebook libraries.
+# MAGIC **`dlt`** モジュールはPythonノートブックライブラリに明示的にインポートする必要があります。
 # MAGIC
-# MAGIC Here, we should importing **`pyspark.sql.functions`** as **`F`**.
+# MAGIC ここでは、 **`pyspark.sql.functions`** を **`F`** としてインポートする必要があります。
 # MAGIC
-# MAGIC Some developers import **`*`**, while others will only import the functions they need in the present notebook.
+# MAGIC 一部の開発者は **`*`** をインポートする一方、他の開発者は現在のノートブックで必要な関数のみをインポートすることがあります。
 # MAGIC
-# MAGIC These lessons will use **`F`** throughout so that students clearly know which methods are imported from this library.
+# MAGIC これらのレッスンでは、 **`F`** を使用して、学生がこのライブラリからインポートされたメソッドが明確にわかるようにします。
 
 # COMMAND ----------
 
@@ -70,21 +70,23 @@ source = spark.conf.get("source")
 
 # DBTITLE 0,--i18n-d260ca6c-11c2-464d-8c16-f5ff6e56b8b0
 # MAGIC %md
-# MAGIC ## Tables as DataFrames
+# MAGIC ## データフレームとしてのテーブル
 # MAGIC
-# MAGIC There are two distinct types of persistent tables that can be created with DLT:
-# MAGIC * **Live tables** are materialized views for the lakehouse; they will return the current results of any query with each refresh
-# MAGIC * **Streaming live tables** are designed for incremental, near-real time data processing
+# MAGIC DLTで作成できる永続的なテーブルには2つの異なるタイプがあります：
+# MAGIC * **ライブテーブル** はレイクハウスのためのマテリアライズドビューで、各リフレッシュごとにクエリの現在の結果を返します
+# MAGIC * **ストリーミングライブテーブル** は増分的でほぼリアルタイムのデータ処理を行うために設計されています
 # MAGIC
-# MAGIC Note that both of these objects are persisted as tables stored with the Delta Lake protocol (providing ACID transactions, versioning, and many other benefits). We'll talk more about the differences between live tables and streaming live tables later in the notebook.
+# MAGIC これらのオブジェクトは、両方ともDelta Lakeプロトコルで格納されるテーブルとして永続化されています（ACIDトランザクション、バージョニング、その他多くの利点を提供）。
 # MAGIC
-# MAGIC Delta Live Tables introduces a number of new Python functions that extend familiar PySpark APIs.
+# MAGIC ライブテーブルとストリーミングライブテーブルの違いについては、ノートブックの後半で詳しく説明します。
 # MAGIC
-# MAGIC At the heart of this design, the decorator **`@dlt.table`** is added to any Python function that returns a Spark DataFrame. (**NOTE**: This includes Koalas DataFrames, but these won't be covered in this course.)
+# MAGIC Delta Live Tablesは、おなじみのPySpark APIを拡張する多くの新しいPython関数を導入しています。
 # MAGIC
-# MAGIC If you're used to working with Spark and/or Structured Streaming, you'll recognize the majority of the syntax used in DLT. The big difference is that you'll never see any methods or options for DataFrame writers, as this logic is handled by DLT.
+# MAGIC この設計の中心にあるのは、 **`@dlt.table`** デコレーターです。これは、Spark DataFrameを返す任意のPython関数に追加されます。（**注意**：これにはKoalas DataFramesも含まれますが、このコースではカバーされません。）
 # MAGIC
-# MAGIC As such, the basic form of a DLT table definition will look like:
+# MAGIC Sparkと/またはStructured Streamingで作業に慣れている場合、DLTで使用される構文の大部分は認識するでしょう。大きな違いは、DataFrameライターのメソッドやオプションを見ることは決してないことです。なぜなら、このロジックはDLTによって処理されるからです。
+# MAGIC
+# MAGIC そのため、DLTテーブルの基本的な形式は以下のようになります：
 # MAGIC
 # MAGIC **`@dlt.table`**<br/>
 # MAGIC **`def <function-name>():`**<br/>
@@ -94,22 +96,21 @@ source = spark.conf.get("source")
 
 # DBTITLE 0,--i18n-969f77f0-34bf-4e23-bdc5-1f0575e99ed1
 # MAGIC %md
+# MAGIC ## Auto Loaderを使用したストリーミング取り込み
 # MAGIC
-# MAGIC ## Streaming Ingestion with Auto Loader
+# MAGIC Databricksは、クラウドオブジェクトストレージからDelta Lakeにデータを増分的にロードするための最適化された実行を提供するために、[Auto Loader](https://docs.databricks.com/ingestion/auto-loader/index.html) 機能を開発しました。DLTと組み合わせてAuto Loaderを使用するのは簡単です：ソースデータディレクトリを設定し、いくつかの設定を提供し、ソースデータに対するクエリを書くだけです。Auto Loaderは、新しいデータファイルがソースクラウドオブジェクトストレージの場所に着信するたびに、新しいレコードを増分的に処理し、高価なスキャンや無限に増加するデータセットの結果を再計算する必要はありません。
 # MAGIC
-# MAGIC Databricks has developed the [Auto Loader](https://docs.databricks.com/ingestion/auto-loader/index.html) functionality to provide optimized execution for incrementally loading data from cloud object storage into Delta Lake. Using Auto Loader with DLT is simple: just configure a source data directory, provide a few configuration settings, and write a query against your source data. Auto Loader will automatically detect new data files as they land in the source cloud object storage location, incrementally processing new records without the need to perform expensive scans and recomputing results for infinitely growing datasets.
+# MAGIC Auto Loaderは、クラウドファイルのフォーマットとして **`format("cloudFiles")`** 設定を構成することで、Databricks全体で増分的なデータインジェクションを実行するためにStructured Streaming APIと組み合わせることができます。DLTでは、データの読み取りに関連する設定のみを構成します。スキーマの推論と進化の場所も、それらの設定が有効になっている場合、自動的に構成されます。
 # MAGIC
-# MAGIC Auto Loader can be combined with Structured Streaming APIs to perform incremental data ingestion throughout Databricks by configuring the **`format("cloudFiles")`** setting. In DLT, you'll only configure settings associated with reading data, noting that the locations for schema inference and evolution will also be configured automatically if those settings are enabled.
+# MAGIC 以下のクエリは、Auto Loaderで構成されたソースからのストリーミングDataFrameを返します。
 # MAGIC
-# MAGIC The query below returns a streaming DataFrame from a source configured with Auto Loader.
+# MAGIC フォーマットとして **`cloudFiles`** を指定する他に、次のことを指定しています：
+# MAGIC * オプション **`cloudFiles.format`** を **`json`** として指定します（これはクラウドオブジェクトストレージのファイルのフォーマットを示します）
+# MAGIC * オプション **`cloudFiles.inferColumnTypes`** を **`True`** として指定します（各列の型を自動検出するため）
+# MAGIC * クラウドオブジェクトストレージへのパスを **`load`** メソッドに指定します
+# MAGIC * ソースフィールドに沿ってデータをエンリッチするいくつかの **`pyspark.sql.functions`** を含むselectステートメント
 # MAGIC
-# MAGIC In addition to passing **`cloudFiles`** as the format, here we specify:
-# MAGIC * The option **`cloudFiles.format`** as **`json`** (this indicates the format of the files in the cloud object storage location)
-# MAGIC * The option **`cloudFiles.inferColumnTypes`** as **`True`** (to auto-detect the types of each column)
-# MAGIC * The path of the cloud object storage to the **`load`** method
-# MAGIC * A select statement that includes a couple of **`pyspark.sql.functions`** to enrich the data alongside all the source fields
-# MAGIC
-# MAGIC By default, **`@dlt.table`** will use the name of the function as the name for the target table.
+# MAGIC デフォルトでは、 **`@dlt.table`** はターゲットテーブルの名前として関数の名前を使用します。
 
 # COMMAND ----------
 
@@ -132,40 +133,42 @@ def orders_bronze():
 
 # DBTITLE 0,--i18n-d4d6be28-67fb-44d8-ab4a-cfae62d819ed
 # MAGIC %md
-# MAGIC ## Validating, Enriching, and Transforming Data
+# MAGIC ## データの検証、エンリッチ、変換
 # MAGIC
-# MAGIC DLT allows users to easily declare tables from results of any standard Spark transformations. DLT adds new functionality for data quality checks and provides a number of options to allow users to enrich the metadata for created tables.
+# MAGIC DLTを使用すると、標準的なSpark変換の結果からテーブルを簡単に宣言できます。DLTはデータ品質チェックの新しい機能を追加し、作成されたテーブルのメタデータをエンリッチするための多くのオプションを提供します。
 # MAGIC
-# MAGIC Let's break down the syntax of the query below.
+# MAGIC 以下のクエリの構文を詳しく見てみましょう。
 # MAGIC
-# MAGIC ### Options for **`@dlt.table()`**
+# MAGIC ### **`@dlt.table()`** のオプション
 # MAGIC
-# MAGIC There are <a href="https://docs.databricks.com/data-engineering/delta-live-tables/delta-live-tables-python-ref.html#create-table" target="_blank">a number of options</a> that can be specified during table creation. Here, we use two of these to annotate our dataset.
+# MAGIC テーブルの作成時に指定できる<a href="https://docs.databricks.com/data-engineering/delta-live-tables/delta-live-tables-python-ref.html#create-table" target="_blank">オプション</a>がいくつかあります。ここでは、データセットを注釈付けするために2つのオプションを使用します。
 # MAGIC
 # MAGIC ##### **`comment`**
 # MAGIC
-# MAGIC Table comments are a standard for relational databases. They can be used to provide useful information to users throughout your organization. In this example, we write a short human-readable description of the table that describes how data is being ingested and enforced (which could also be gleaned from reviewing other table metadata).
+# MAGIC テーブルコメントはリレーショナルデータベースの標準です。これらは、組織全体のユーザーに有用な情報を提供するために使用できます。この例では、テーブルの短い人間が読める説明を記述し、データの取り込みと強制がどのように行われているかを説明しています（他のテーブルのメタデータを確認することでも得られる情報です）。
 # MAGIC
 # MAGIC ##### **`table_properties`**
 # MAGIC
-# MAGIC This field can be used to pass any number of key/value pairs for custom tagging of data. Here, we set the value **`silver`** for the key **`quality`**.
+# MAGIC このフィールドを使用して、データのカスタムタグ付けに任意のキー/値ペアを渡すことができます。ここでは、キー **`quality`** に対して値 **`silver`** を設定します。
 # MAGIC
-# MAGIC Note that while this field allows for custom tags to be arbitrarily set, it is also used for configuring number of settings that control how a table will perform. While reviewing table details, you may also encounter a number of settings that are turned on by default any time a table is created.
+# MAGIC このフィールドはカスタムタグを任意に設定できる一方、テーブルの動作を制御する設定の数も構成に使用されます。テーブルの詳細を確認する際に、テーブルが作成されるたびにデフォルトでオンになる設定もいくつか見つかるかもしれません。
 # MAGIC
-# MAGIC ### Data Quality Constraints
+# MAGIC ### データ品質制約
 # MAGIC
-# MAGIC The Python version of DLT uses decorator functions to set <a href="https://docs.databricks.com/data-engineering/delta-live-tables/delta-live-tables-expectations.html#delta-live-tables-data-quality-constraints" target="_blank">data quality constraints</a>. We'll see a number of these throughout the course.
+# MAGIC PythonバージョンのDLTは、<a href="https://docs.databricks.com/data-engineering/delta-live-tables/delta-live-tables-expectations.html#delta-live-tables-data-quality-constraints" target="_blank">データ品質制約</a>を設定するためにデコレータ関数を使用します。このコースでは、いくつかの制約を見ていきます。
 # MAGIC
-# MAGIC DLT uses simple boolean statements to allow quality enforcement checks on data. In the statement below, we:
-# MAGIC * Declare a constraint named **`valid_date`**
-# MAGIC * Define the conditional check that the field **`order_timestamp`** must contain a value greater than January 1, 2021
-# MAGIC * Instruct DLT to fail the current transaction if any records violate the constraint by using the decorator **`@dlt.expect_or_fail()`**
+# MAGIC DLTは、データの品質強制チェックに対する単純なブール式を使用しています。以下のステートメントでは、以下のことを実行します：
+# MAGIC * **`valid_date`** という名前の制約を宣言します
+# MAGIC * 条件チェックを定義し、フィールド **`order_timestamp`** が2021年1月1日よりも大きい値を含む必要があると指定します
+# MAGIC * デコレータ **`@dlt.expect_or_fail()`** を使用して、制約を違反するレコードがある場合、現在のトランザクションを失敗させるようにDLTに指示します
 # MAGIC
-# MAGIC Each constraint can have multiple conditions, and multiple constraints can be set for a single table. In addition to failing the update, constraint violation can also automatically drop records or just record the number of violations while still processing these invalid records.
+# MAGIC 各制約には複数の条件を持たせることができ、1つのテーブルに複数の制約を設定できます。制約違反は更新を失敗させるだけでなく、レコードを自動的に削除したり、無効なレコードを処理しながら違反の数を記録したりすることもできます。
 # MAGIC
-# MAGIC ### DLT Read Methods
+# MAGIC ### DLT読み込みメソッド
 # MAGIC
-# MAGIC The Python **`dlt`** module provides the **`read()`** and **`read_stream()`** methods to easily configure references to other tables and views in your DLT Pipeline. This syntax allows you to reference these datasets by name without any database reference. You can also use **`spark.table("LIVE.<table_name.")`**, where **`LIVE`** is a keyword substituted for the database being referenced in the DLT Pipeline.
+# MAGIC Pythonの **`dlt`** モジュールは、DLTパイプライン内で他のテーブルとビューへの参照を簡単に構成するための **`read()`** および **`read_stream()`** メソッドを提供します。この構文を使用すると、データベ
+# MAGIC
+# MAGIC ースの参照なしでこれらのデータセットを名前で参照できます。また、DLTパイプラインで参照されているデータベースを置換キーワード **`LIVE`** として使用することもできます。
 
 # COMMAND ----------
 
@@ -189,25 +192,25 @@ def orders_silver():
 
 # DBTITLE 0,--i18n-e6fed8ba-7028-4d19-9310-cc705b7858e4
 # MAGIC %md
-# MAGIC ## Live Tables vs. Streaming Live Tables
+# MAGIC ## Live Tables vs. Streaming Live Tables（ライブテーブル vs. ストリーミングライブテーブル）
 # MAGIC
-# MAGIC The two functions we've reviewed so far have both created streaming live tables. Below, we see a simple function that returns a live table (or materialized view) of some aggregated data.
+# MAGIC これまでに見てきた2つの関数は、いずれもストリーミングライブテーブルを作成しました。以下では、いくつかの集計データのライブテーブル（またはマテリアライズドビュー）を返すシンプルな関数を見てみます。
 # MAGIC
-# MAGIC Spark has historically differentiated between batch queries and streaming queries. Live tables and streaming live tables have similar differences.
+# MAGIC Sparkは、バッチクエリとストリーミングクエリを過去に区別してきました。ライブテーブルとストリーミングライブテーブルにも似たような違いがあります。
 # MAGIC
-# MAGIC Note that these table types inherit the syntax (as well as some of the limitations) of the PySpark and Structured Streaming APIs.
+# MAGIC これらのテーブルタイプは、PySparkおよびStructured Streaming APIの構文（およびいくつかの制限）を継承していることに注意してください。
 # MAGIC
-# MAGIC Below are some of the differences between these types of tables.
+# MAGIC 以下は、これらのタイプのテーブルの違いのいくつかです。
 # MAGIC
-# MAGIC ### Live Tables
-# MAGIC * Always "correct", meaning their contents will match their definition after any update.
-# MAGIC * Return same results as if table had just been defined for first time on all data.
-# MAGIC * Should not be modified by operations external to the DLT Pipeline (you'll either get undefined answers or your change will just be undone).
+# MAGIC ### ライブテーブル
+# MAGIC * 常に「正確」であり、更新後にその内容がその定義と一致します。
+# MAGIC * すべてのデータに対して初めて定義されたかのように同じ結果を返します。
+# MAGIC * DLTパイプラインの外部での操作によって変更されるべきではありません（未定義の回答を受けるか、変更が元に戻される可能性があります）。
 # MAGIC
-# MAGIC ### Streaming Live Tables
-# MAGIC * Only supports reading from "append-only" streaming sources.
-# MAGIC * Only reads each input batch once, no matter what (even if joined dimensions change, or if the query definition changes, etc).
-# MAGIC * Can perform operations on the table outside the managed DLT Pipeline (append data, perform GDPR, etc).
+# MAGIC ### ストリーミングライブテーブル
+# MAGIC * "追記のみ"のストリーミングソースからの読み取りのみをサポートします。
+# MAGIC * 入力バッチごとに1回だけ読み取ります（対象ディメンションが変更された場合、クエリの定義が変更された場合など、関係なく）。
+# MAGIC * 管理されていないDLTパイプラインの外でテーブルに操作を実行できます（データを追加、GDPRを実行など）。
 
 # COMMAND ----------
 
@@ -223,17 +226,17 @@ def orders_by_date():
 
 # DBTITLE 0,--i18n-facc7d78-16e4-4f03-a232-bb5e4036952a
 # MAGIC %md
-# MAGIC ## Summary
+# MAGIC ## まとめ
 # MAGIC
-# MAGIC By reviewing this notebook, you should now feel comfortable:
-# MAGIC * Declaring Delta Live Tables
-# MAGIC * Ingesting data with Auto Loader
-# MAGIC * Using parameters in DLT Pipelines
-# MAGIC * Enforcing data quality with constraints
-# MAGIC * Adding comments to tables
-# MAGIC * Describing differences in syntax and execution of live tables streaming live tables
+# MAGIC このノートブックを見て、以下の内容について快適に感じるはずです：
+# MAGIC * Delta Live Tablesの宣言
+# MAGIC * Auto Loaderを使用したデータの取り込み
+# MAGIC * DLTパイプラインでのパラメータの使用
+# MAGIC * 制約によるデータ品質の強制
+# MAGIC * テーブルにコメントを追加
+# MAGIC * ライブテーブルとストリーミングライブテーブルの構文と実行の違いの説明
 # MAGIC
-# MAGIC In the next notebook, we'll continue learning about these syntactic constructs while adding a few new concepts.
+# MAGIC 次のノートブックでは、これらの構文構造についてさらに学びながら、新しいコンセプトをいくつか追加します。
 
 # COMMAND ----------
 

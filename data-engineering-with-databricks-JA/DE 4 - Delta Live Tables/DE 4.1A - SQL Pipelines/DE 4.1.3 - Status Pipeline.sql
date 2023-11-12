@@ -9,53 +9,53 @@
 
 -- DBTITLE 0,--i18n-54a6a2f6-5787-4d60-aea6-e39627954c96
 -- MAGIC %md
--- MAGIC # Troubleshooting DLT SQL Syntax
+-- MAGIC # DLT SQL構文のトラブルシューティング
 -- MAGIC
--- MAGIC Now that we've gone through the process of configuring and running a pipeline with 2 notebooks, we'll simulate developing and adding a 3rd notebook.
+-- MAGIC 2つのノートブックでパイプラインの設定と実行のプロセスを経た後、今度は3つ目のノートブックを開発して追加することをシミュレートします。
 -- MAGIC
--- MAGIC **DON'T PANIC!** Things are about to break.
+-- MAGIC **パニックにならないでください！** これから問題が発生します。
 -- MAGIC
--- MAGIC The code provided below contains some intentional, small syntax errors. By troubleshooting these errors, you'll learn how to iteratively develop DLT code and identify errors in your syntax.
+-- MAGIC 以下に提供されているコードには、意図的な小さな構文エラーが含まれています。これらのエラーをトラブルシューティングすることで、DLTコードの反復的な開発方法と構文のエラーを特定する方法を学びます。
 -- MAGIC
--- MAGIC This lesson is not meant to provide a robust solution for code development and testing; rather, it is intended to help users getting started with DLT and struggling with an unfamiliar syntax.
+-- MAGIC このレッスンは、コード開発とテストの堅牢なソリューションを提供することを目的としたものではありません。むしろ、DLTを始めたばかりで、馴染みのない構文に苦労しているユーザーを支援することを目的としています。
 -- MAGIC
--- MAGIC ## Learning Objectives
--- MAGIC By the end of this lesson, students should feel comfortable:
--- MAGIC * Identifying and troubleshooting DLT syntax 
--- MAGIC * Iteratively developing DLT pipelines with notebooks
+-- MAGIC ## 学習目標
+-- MAGIC このレッスンの終わりまでに、学生は以下について快適に感じることができるはずです：
+-- MAGIC * DLT構文の特定とトラブルシューティング
+-- MAGIC * ノートブックでのDLTパイプラインの反復的な開発
 
 -- COMMAND ----------
 
 -- DBTITLE 0,--i18n-dee15416-56fd-48d7-ae3c-126175503a9b
 -- MAGIC %md
--- MAGIC ## Add this Notebook to a DLT Pipeline
+-- MAGIC ## このノートブックをDLTパイプラインに追加する
 -- MAGIC
--- MAGIC At this point in the course, you should have a DLT Pipeline configured with 2 notebook libraries.
+-- MAGIC このコースのこの段階では、2つのノートブックライブラリで構成されたDLTパイプラインを持っているはずです。
 -- MAGIC
--- MAGIC You should have processed several batches of records through this pipeline, and should understand how to trigger a new run of the pipeline and add an additional library.
+-- MAGIC このパイプラインを通じて複数のデータバッチを処理し、新しい実行をトリガーし、追加ライブラリを追加する方法を理解しているはずです。
 -- MAGIC
--- MAGIC To begin this lesson, go through the process of adding this notebook to your pipeline using the DLT UI, and then trigger an update.
+-- MAGIC このレッスンを始めるには、DLT UIを使用してこのノートブックをパイプラインに追加するプロセスを行い、その後アップデートをトリガーしてください。
 -- MAGIC
--- MAGIC <img src="https://files.training.databricks.com/images/icon_hint_24.png"> The link to this notebook can be found back in [DE 4.1 - DLT UI Walkthrough]($../DE 4.1 - DLT UI Walkthrough)<br/>
--- MAGIC in the printed instructions for **Task #3** under the section **Generate Pipeline Configuration**
+-- MAGIC <img src="https://files.training.databricks.com/images/icon_hint_24.png"> このノートブックへのリンクは [DE 4.1 - DLT UIウォークスルー]($../DE 4.1 - DLT UI Walkthrough) に戻って<br/>
+-- MAGIC **Generate Pipeline Configuration** セクションの **Task #3** の印刷された指示に記載されています。
 
 -- COMMAND ----------
 
 -- DBTITLE 0,--i18n-96beb691-44d9-4871-9fa5-fcccc3e13616
 -- MAGIC %md
--- MAGIC ## Troubleshooting Errors
+-- MAGIC ## エラーのトラブルシューティング
 -- MAGIC
--- MAGIC Each of the 3 queries below contains a syntax error, but each of these errors will be detected and reported slightly differently by DLT.
+-- MAGIC 以下の3つのクエリそれぞれに構文エラーが含まれていますが、DLTによってこれらのエラーは異なる方法で検出され報告されます。
 -- MAGIC
--- MAGIC Some syntax errors will be detected during the **Initializing** stage, as DLT is not able to properly parse the commands.
+-- MAGIC 一部の構文エラーは、**初期化中**の段階で検出されます。これはDLTがコマンドを適切に解析できないためです。
 -- MAGIC
--- MAGIC Other syntax errors will be detected during the **Setting up tables** stage.
+-- MAGIC 他の構文エラーは、**テーブルの設定中**の段階で検出されます。
 -- MAGIC
--- MAGIC Note that because of the way DLT resolves the order of tables in the pipeline at different steps, you may sometimes see errors thrown for later stages first.
+-- MAGIC パイプライン内のテーブルの順序をDLTが異なるステップで解決する方法のため、時には後の段階のエラーが先に表示されることがあります。
 -- MAGIC
--- MAGIC An approach that can work well is to fix one table at a time, starting at your earliest dataset and working toward your final. Commented code will be ignored automatically, so you can safely remove code from a development run without removing it entirely.
+-- MAGIC うまくいくアプローチは、最初のデータセットから始めて最終的なものに向かって一度に一つのテーブルを修正することです。コメントアウトされたコードは自動的に無視されるので、開発実行からコードを完全に削除せずに安全に取り除くことができます。
 -- MAGIC
--- MAGIC Even if you can immediately spot the errors in the code below, try to use the error messages from the UI to guide your identification of these errors. Solution code follows in the cell below.
+-- MAGIC 以下のコードでエラーをすぐに見つけられたとしても、UIのエラーメッセージを使ってこれらのエラーの特定をガイドするようにしてみてください。解決策のコードは以下のセルに続きます。
 
 -- COMMAND ----------
 
@@ -79,29 +79,29 @@ ON a.order_id = b.order_id;
 
 -- DBTITLE 0,--i18n-492901e2-38fe-4a8c-a05d-87b9dedd775f
 -- MAGIC %md
--- MAGIC ## Solutions
+-- MAGIC ## 解決策
 -- MAGIC
--- MAGIC The correct syntax for each of our above functions is provided in a notebook by the same name in the Solutions folder.
+-- MAGIC 上記の各関数の正しい構文は、Solutionsフォルダにある同名のノートブックで提供されています。
 -- MAGIC
--- MAGIC To address these errors you have serveral options:
--- MAGIC * Work through each issue, fixing the problems above yourself
--- MAGIC * Copy and paste the solution in the **`# ANSWER`** cell from the Solutions notebook of the same name
--- MAGIC * Update your pipline to directly use the Solutions notebook of the same name
+-- MAGIC これらのエラーに対処するには、いくつかのオプションがあります：
+-- MAGIC * 各問題を一つずつ取り組み、上記の問題を自分で修正する
+-- MAGIC * 同名のSolutionsノートブックの **`# ANSWER`** セルから解決策をコピー＆ペーストする
+-- MAGIC * 同名のSolutionsノートブックを直接使用するようにパイプラインを更新する
 -- MAGIC
--- MAGIC The issues in each query:
--- MAGIC 1. The **`LIVE`** keyword is missing from the create statement
--- MAGIC 1. The **`STREAM`** keyword is missing in the from clause
--- MAGIC 1. The **`LIVE`** keyword is missing from the table referenced by the from clause
+-- MAGIC 各クエリの問題点：
+-- MAGIC 1. create文から **`LIVE`** キーワードが欠けています
+-- MAGIC 1. from句に **`STREAM`** キーワードが欠けています
+-- MAGIC 1. from句によって参照されるテーブルから **`LIVE`** キーワードが欠けています
 
 -- COMMAND ----------
 
 -- DBTITLE 0,--i18n-54e251d6-b8f8-45c2-82df-60e22b127135
 -- MAGIC %md
--- MAGIC ## Summary
+-- MAGIC ## まとめ
 -- MAGIC
--- MAGIC By reviewing this notebook, you should now feel comfortable:
--- MAGIC * Identifying and troubleshooting DLT syntax 
--- MAGIC * Iteratively developing DLT pipelines with notebooks
+-- MAGIC このノートブックを確認することで、以下の点について快適に感じるはずです：
+-- MAGIC * DLT構文の特定とトラブルシューティング
+-- MAGIC * ノートブックを使用してDLTパイプラインを反復的に開発する
 
 -- COMMAND ----------
 

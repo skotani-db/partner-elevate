@@ -9,53 +9,52 @@
 
 # DBTITLE 0,--i18n-17f3cfcf-2ad7-48f2-bf4e-c2adcb372926
 # MAGIC %md
-# MAGIC # Troubleshooting DLT Python Syntax
+# MAGIC # DLT Pythonの構文のトラブルシューティング
 # MAGIC
-# MAGIC Now that we've gone through the process of configuring and running a pipeline with 2 notebooks, we'll simulate developing and adding a 3rd notebook.
+# MAGIC 2つのノートブックを構成して実行するプロセスを実行したので、3番目のノートブックを開発して追加するプロセスをシミュレーションします。
 # MAGIC
-# MAGIC **DON'T PANIC!**
+# MAGIC **心配しないでください！**
 # MAGIC
-# MAGIC The code provided below contains some intentional, small syntax errors. By troubleshooting these errors, you'll learn how to iteratively develop DLT code and identify errors in your syntax.
+# MAGIC 以下で提供されるコードには、意図的な小さな構文エラーがいくつか含まれています。これらのエラーをトラブルシューティングすることで、DLTコードを段階的に開発し、構文のエラーを特定する方法を学びます。
 # MAGIC
-# MAGIC This lesson is not meant to provide a robust solution for code development and testing; rather, it is intended to help users getting started with DLT and struggling with an unfamiliar syntax.
+# MAGIC このレッスンは、コード開発とテストのための堅牢なソリューションを提供するものではありません。代わりに、DLTを始めて使っており、なじみのない構文に苦労しているユーザーに役立つことを意図しています。
 # MAGIC
-# MAGIC ## Learning Objectives
-# MAGIC By the end of this lesson, students should feel comfortable:
-# MAGIC * Identifying and troubleshooting DLT syntax 
-# MAGIC * Iteratively developing DLT pipelines with notebooks
+# MAGIC ## 学習目標
+# MAGIC このレッスンの終わりまでに、学生は次のことを快適に感じるはずです:
+# MAGIC * DLTの構文を特定し、トラブルシューティングする方法
+# MAGIC * ノートブックを使用してDLTパイプラインを段階的に開発する方法
 
 # COMMAND ----------
 
 # DBTITLE 0,--i18n-b6eb7861-af09-4009-a272-1c5c91f87a8b
 # MAGIC %md
-# MAGIC ## Add this Notebook to a DLT Pipeline
+# MAGIC ## このノートブックをDLTパイプラインに追加
 # MAGIC
-# MAGIC At this point in the course, you should have a DLT Pipeline configured with 2 notebook library.
+# MAGIC このコースのこの段階では、2つのノートブックライブラリで構成されたDLTパイプラインを構成する必要があります。
 # MAGIC
-# MAGIC You should have processed several batches of records through this pipeline, and should understand how to trigger a new run of the pipeline and add an additional library.
+# MAGIC このパイプラインを通じて複数のレコードのバッチを処理し、パイプラインを新たに実行して追加のライブラリを追加する方法を理解しているはずです。
 # MAGIC
-# MAGIC To begin this lesson, go through the process of adding this notebook to your pipeline using the DLT UI, and then trigger an update.
+# MAGIC このレッスンを開始するには、DLT UIを使用してこのノートブックをパイプラインに追加し、次に更新をトリガーします。
 # MAGIC
-# MAGIC <img src="https://files.training.databricks.com/images/icon_hint_24.png"> The link to this notebook can be found back in [DE 4.1 - DLT UI Walkthrough]($../DE 4.1 - DLT UI Walkthrough)<br/>
-# MAGIC in the printed instructions for **Task #3** under the section **Generate Pipline Configuration**
+# MAGIC <img src="https://files.training.databricks.com/images/icon_hint_24.png"> このノートブックへのリンクは、[DE 4.1 - DLT UIウォークスルー]($../DE 4.1 - DLT UIウォークスルー)の**タスク#3**の**パイプライン設定を生成**セクションで印刷された手順に戻ることができます。
 
 # COMMAND ----------
 
 # DBTITLE 0,--i18n-fb7a717a-7921-45c3-bb1d-4c2e1bff55ab
 # MAGIC %md
-# MAGIC ## Troubleshooting Errors
+# MAGIC ## エラーのトラブルシューティング
 # MAGIC
-# MAGIC Each of the 3 functions below contains a syntax error, but each of these errors will be detected and reported slightly differently by DLT.
+# MAGIC 以下の3つの関数にはそれぞれ構文エラーが含まれていますが、これらのエラーはDLTによって異なる方法で検出および報告されます。
 # MAGIC
-# MAGIC Some syntax errors will be detected during the **Initializing** stage, as DLT is not able to properly parse the commands.
+# MAGIC 一部の構文エラーは、DLTがコマンドを適切に解析できないため、**初期化**の段階で検出されます。
 # MAGIC
-# MAGIC Other syntax errors will be deteced during the **Setting up tables** stage.
+# MAGIC 他の構文エラーは、**テーブルの設定**の段階で検出されます。
 # MAGIC
-# MAGIC Note that because of the way DLT resolves the order of tables in the pipeline at different steps, you may sometimes see errors thrown for later stages first.
+# MAGIC DLTがパイプライン内のテーブルの順序を異なるステップで解決する方法のため、後の段階で最初にエラーがスローされることがあることに注意してください。
 # MAGIC
-# MAGIC An approach that can work well is to fix one table at a time, starting at your earliest dataset and working toward your final. Commented code will be ignored automatically, so you can safely remove code from a development run without removing it entirely.
+# MAGIC うまくいくアプローチは、最初のデータセットから始めて最終的なデータセットに向かって1つずつテーブルを修正することです。コメントアウトされたコードは自動的に無視されるため、開発ランからコードを完全に削除せずに安全にコードを削除できます。
 # MAGIC
-# MAGIC Even if you can immediately spot the errors in the code below, try to use the error messages from the UI to guide your identification of these errors. Solution code follows in the cell below.
+# MAGIC 以下のコードのエラーをすぐに見つけることができても、UIからのエラーメッセージを使用してこれらのエラーの識別をガイドするようにしてください。解決策のコードは、以下のセルに続きます。
 
 # COMMAND ----------
 
@@ -106,31 +105,31 @@ def email_updates():
 
 # DBTITLE 0,--i18n-5bb5f3ef-7a9e-4ea5-a6c3-f85cac306e04
 # MAGIC %md
-# MAGIC ## Solutions
+# MAGIC ##  解決策
 # MAGIC
-# MAGIC The correct syntax for each of our above functions is provided in a notebook by the same name in the Solutions folder.
+# MAGIC 上記の各関数の正しい構文は、同じ名前のノートブック内で提供されています。
 # MAGIC
-# MAGIC To address these errors you have serveral options:
-# MAGIC * Work through each issue, fixing the problems above yourself
-# MAGIC * Copy and paste the solution in the **`# ANSWER`** cell from the Solutions notebook of the same name
-# MAGIC * Update your pipline to directly use the Solutions notebook of the same name
+# MAGIC これらのエラーに対処するためには、次のオプションがあります。
+# MAGIC * 各問題を解決し、上記の問題を自分で修正する
+# MAGIC * 同じ名前のSolutionsフォルダ内のSolutionsノートブックから**`# ANSWER`** セルをコピーして貼り付ける
+# MAGIC * パイプラインを直接同じ名前のSolutionsノートブックを使用するように更新する
 # MAGIC
-# MAGIC **NOTE**: You won't be able to see any of the other errors until you add the **`import dlt`** statement to the cell above.
+# MAGIC **注意**: **`import dlt`** ステートメントを上のセルに追加するまで、他のエラーは表示されません。 
 # MAGIC
-# MAGIC The issues in each query:
-# MAGIC 1. The **`@dlt.table`** decorator is missing before the function definition
-# MAGIC 1. The correct keyword argument to provide a custom table name is **`name`** not **`table_name`**
-# MAGIC 1. To perform a read on a table in the pipeline, use **`dlt.read`** not **`spark.read`**
+# MAGIC 各クエリの問題点：
+# MAGIC 1. 関数定義の前に **`@dlt.table`** デコレーターが抜けています。
+# MAGIC 1. カスタムテーブル名を提供するための正しいキーワード引数は **`name`** であり、 **`table_name`** ではありません。
+# MAGIC 1. パイプライン内のテーブルで読み取りを実行するには、 **`spark.read`** ではなく **`dlt.read`** を使用します。
 
 # COMMAND ----------
 
 # DBTITLE 0,--i18n-f8fb12d5-c515-43fc-ab55-0d1f97baf05c
 # MAGIC %md
-# MAGIC ## Summary
+# MAGIC ## 要約
 # MAGIC
-# MAGIC By reviewing this notebook, you should now feel comfortable:
-# MAGIC * Identifying and troubleshooting DLT syntax 
-# MAGIC * Iteratively developing DLT pipelines with notebooks
+# MAGIC このノートブックを通じて、以下のことを学びました:
+# MAGIC * DLTの構文を識別し、トラブルシューティングする方法
+# MAGIC * ノートブックを使用してDLTパイプラインを反復的に開発する方法
 
 # COMMAND ----------
 

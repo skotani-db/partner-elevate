@@ -9,11 +9,11 @@
 
 # DBTITLE 0,--i18n-cee8cef7-2341-42cd-beef-9a60958d8e70
 # MAGIC %md
-# MAGIC # Land New Data
+# MAGIC # 新しいデータの取り込み
 # MAGIC
-# MAGIC This notebook is provided for the sole purpose of manually triggering new batches of data to be processed by an already configured Delta Live Tables pipeline.
+# MAGIC このノートブックは、既に設定されているDelta Live Tablesパイプラインによって処理される新しいデータバッチを手動でトリガーするためだけに提供されています。
 # MAGIC
-# MAGIC Note that the logic provided is identical to that provided in the first interactive notebook, but does not reset the source or target directories for the pipeline.
+# MAGIC 提供されているロジックは最初のインタラクティブノートブックで提供されているものと同一ですが、パイプラインのソースやターゲットディレクトリをリセットすることはありません。
 
 # COMMAND ----------
 
@@ -23,7 +23,7 @@
 
 # DBTITLE 0,--i18n-884cce97-7746-4b9e-abe8-1fdbd38124bf
 # MAGIC %md
-# MAGIC Each time this cell is run, a new batch of data files will be loaded into the source directory used in these lessons.
+# MAGIC このセルを実行するたびに、新しいバッチのデータファイルがこれらのレッスンで使用されるソースディレクトリに読み込まれます。
 
 # COMMAND ----------
 
@@ -34,8 +34,8 @@ DA.dlt_data_factory.load()
 # DBTITLE 0,--i18n-f9e15f42-07c9-4522-9c3f-7e0c975ad41d
 # MAGIC %md
 # MAGIC
-# MAGIC # Land All Remaining Data
-# MAGIC Alternatively, you can uncomment and run the following cell to load all remaining batches of data.
+# MAGIC # 残りのデータをすべて取り込む
+# MAGIC 代わりに、以下のセルのコメントアウトを解除して実行することで、残りのすべてのデータバッチを読み込むことができます。
 
 # COMMAND ----------
 

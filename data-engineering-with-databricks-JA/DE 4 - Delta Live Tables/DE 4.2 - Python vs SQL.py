@@ -9,28 +9,28 @@
 
 # DBTITLE 0,--i18n-6ee8963d-1bec-43df-9729-b4da38e8ad0d
 # MAGIC %md
-# MAGIC # Delta Live Tables: Python vs SQL
+# MAGIC # デルタライブテーブル：PythonとSQLの比較
 # MAGIC
-# MAGIC In this lesson we will be reviewing key differences between the Python and SQL implementations of Delta Live Tables
+# MAGIC このレッスンでは、デルタライブテーブルのPython実装とSQL実装の主な違いについて見ていきます。
 # MAGIC
-# MAGIC By the end of this lesson you will be able to: 
+# MAGIC このレッスンを終える頃には、以下のことができるようになります：
 # MAGIC
-# MAGIC * Identify key differences between the Python and SQL implementations of Delta Live Tables
+# MAGIC * デルタライブテーブルのPython実装とSQL実装の主な違いを特定する
 
 # COMMAND ----------
 
 # DBTITLE 0,--i18n-48342971-ca6a-4774-88e1-951b8189bec4
 # MAGIC %md
 # MAGIC
-# MAGIC # Python vs SQL
-# MAGIC | Python | SQL | Notes |
+# MAGIC # PythonとSQLの比較
+# MAGIC | Python | SQL | 備考 |
 # MAGIC |--------|--------|--------|
-# MAGIC | Python API | Proprietary SQL API |  |
-# MAGIC | No syntax check | Has syntax checks| In Python, if you run a DLT notebook cell on its own it will show in error, whereas in SQL it will check if the command is syntactically valid and tell you. In both cases, individual notebook cells are not supposed to be run for DLT pipelines. |
-# MAGIC | A note on imports | None | The dlt module should be explicitly imported into your Python notebook libraries. In SQL, this is not the case. |
-# MAGIC | Tables as DataFrames | Tables as query results | The Python DataFrame API allows for multiple transformations of a dataset by stringing multiple API calls together. Compared to SQL, those same transformations must be saved in temporary tables as they are transformed. |
-# MAGIC |@dlt.table()  | SELECT statement | In SQL, the core logic of your query, containing transformations you make to your data, is contained in the SELECT statement. In Python, data transformations are specified when you configure options for @dlt.table().  |
-# MAGIC | @dlt.table(comment = "Python comment",table_properties = {"quality": "silver"}) | COMMENT "SQL comment"       TBLPROPERTIES ("quality" = "silver") | This is how you add comments and table properties in Python vs. SQL |
+# MAGIC | Python API | 独自のSQL API |  |
+# MAGIC | 構文チェックなし | 構文チェックあり | Pythonでは、DLTノートブックのセルを単独で実行するとエラーが表示されますが、SQLではコマンドが文法的に有効かどうかをチェックして教えてくれます。どちらの場合も、個々のノートブックのセルはDLTパイプラインで実行することは想定されていません。 |
+# MAGIC | インポートに関する注意 | なし | dltモジュールはPythonノートブックライブラリに明示的にインポートする必要があります。SQLではこれは必要ありません。 |
+# MAGIC | テーブルをデータフレームとして | テーブルをクエリ結果として | PythonのDataFrame APIでは、複数のAPIコールを連結することにより、データセットの複数の変換を行うことができます。これに対してSQLでは、同じ変換を行う場合は、それらを一時的なテーブルに保存する必要があります。 |
+# MAGIC | @dlt.table() | SELECT文 | SQLでは、データに対する変換を含むクエリの主要なロジックがSELECT文に含まれます。Pythonでは、データ変換は@dlt.table()のオプションを設定する際に指定されます。 |
+# MAGIC | @dlt.table(comment = "Pythonのコメント",table_properties = {"quality": "silver"}) | COMMENT "SQLのコメント" TBLPROPERTIES ("quality" = "silver") | PythonとSQLでコメントとテーブルプロパティを追加する方法です。 |
 
 # COMMAND ----------
 

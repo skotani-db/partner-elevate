@@ -9,11 +9,11 @@
 
 # DBTITLE 0,--i18n-fea707eb-314a-41a8-8da5-fdac27ebe622
 # MAGIC %md
-# MAGIC # Exploring the Pipeline Events Logs
+# MAGIC # パイプラインイベントログの探索
 # MAGIC
-# MAGIC DLT uses the event logs to store much of the important information used to manage, report, and understand what's happening during pipeline execution.
+# MAGIC DLTでは、パイプラインの実行中に何が起こっているかを管理、報告、理解するために重要な情報の多くをイベントログに保存しています。
 # MAGIC
-# MAGIC Below, we provide a number of useful queries to explore the event log and gain greater insight into your DLT pipelines.
+# MAGIC 以下に、イベントログを探索し、DLTパイプラインについてのより深い洞察を得るための有用なクエリをいくつか提供します。
 
 # COMMAND ----------
 
@@ -23,10 +23,10 @@
 
 # DBTITLE 0,--i18n-db58d66a-73bf-412a-ae17-b00f98338f56
 # MAGIC %md
-# MAGIC ## Query Event Log
-# MAGIC The event log is managed as a Delta Lake table with some of the more important fields stored as nested JSON data.
+# MAGIC ## イベントログのクエリ
+# MAGIC イベントログはデルタレイクテーブルとして管理されており、より重要なフィールドのいくつかはネストされたJSONデータとして保存されています。
 # MAGIC
-# MAGIC The query below shows how simple it is to read this table and created a DataFrame and temporary view for interactive querying.
+# MAGIC 以下のクエリは、このテーブルを読み込んでDataFrameを作成し、インタラクティブなクエリのための一時的なビューを作成する方法がいかにシンプルかを示しています。
 
 # COMMAND ----------
 
@@ -41,11 +41,11 @@ display(event_log)
 
 # DBTITLE 0,--i18n-b5f6dcac-b958-4809-9942-d45e475b6fb7
 # MAGIC %md
-# MAGIC ## Set Latest Update ID
+# MAGIC ## 最新のアップデートIDを設定
 # MAGIC
-# MAGIC In many cases, you may wish to gain updates about the latest update (or the last N updates) to your pipeline.
+# MAGIC 多くの場合、パイプラインへの最新のアップデート（または最後のN回のアップデート）についての情報を得たいと思うかもしれません。
 # MAGIC
-# MAGIC We can easily capture the most recent update ID with a SQL query.
+# MAGIC SQLクエリを使って、最も最近のアップデートIDを簡単に取得できます。
 
 # COMMAND ----------
 
@@ -64,11 +64,11 @@ spark.conf.set('latest_update.id', latest_update_id)
 
 # DBTITLE 0,--i18n-de7c7817-fcfd-4994-beb0-704099bd5c30
 # MAGIC %md
-# MAGIC ## Perform Audit Logging
+# MAGIC ## 監査ログの実行
 # MAGIC
-# MAGIC Events related to running pipelines and editing configurations are captured as **`user_action`**.
+# MAGIC パイプラインの実行や設定の編集に関連するイベントは、**`user_action`** として記録されます。
 # MAGIC
-# MAGIC Yours should be the only **`user_name`** for the pipeline you configured during this lesson.
+# MAGIC このレッスンで設定したパイプラインに関しては、あなたの **`user_name`** が唯一のものであるはずです。
 
 # COMMAND ----------
 
@@ -81,11 +81,11 @@ spark.conf.set('latest_update.id', latest_update_id)
 
 # DBTITLE 0,--i18n-887a16ce-e1a5-4d27-bacb-7e6c84cbaf37
 # MAGIC %md
-# MAGIC ## Examine Lineage
+# MAGIC ## リネージの調査
 # MAGIC
-# MAGIC DLT provides built-in lineage information for how data flows through your table.
+# MAGIC DLTは、テーブルを通じてデータがどのように流れるかについての組み込みのライニージ情報を提供します。
 # MAGIC
-# MAGIC While the query below only indicates the direct predecessors for each table, this information can easily be combined to trace data in any table back to the point it entered the lakehouse.
+# MAGIC 以下のクエリは各テーブルの直接の前身を示しているだけですが、この情報は簡単に組み合わせて、任意のテーブル内のデータをレイクハウスに入った時点まで遡ることができます。
 
 # COMMAND ----------
 
@@ -99,11 +99,11 @@ spark.conf.set('latest_update.id', latest_update_id)
 
 # DBTITLE 0,--i18n-1b1c0687-163f-4684-a570-3cf4cc32c272
 # MAGIC %md
-# MAGIC ## Examine Data Quality Metrics
+# MAGIC ## データ品質メトリクスの調査
 # MAGIC
-# MAGIC Finally, data quality metrics can be extremely useful for both long term and short term insights into your data.
+# MAGIC 最後に、データ品質メトリクスは、長期的および短期的なデータ洞察の両方に非常に有用です。
 # MAGIC
-# MAGIC Below, we capture the metrics for each constraint throughout the entire lifetime of our table.
+# MAGIC 以下では、テーブルの全体的な寿命にわたる各制約のメトリクスをキャプチャします。
 
 # COMMAND ----------
 

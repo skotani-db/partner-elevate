@@ -9,21 +9,19 @@
 
 # DBTITLE 0,--i18n-4603b7f5-e86f-44b2-a449-05d556e4769c
 # MAGIC %md
+# MAGIC # Databricks Workflowsを使用したジョブのオーケストレーション
 # MAGIC
+# MAGIC Databricks Jobs UIの新しいアップデートにより、複数のタスクをジョブの一部としてスケジュールする機能が追加され、Databricks Jobsはほとんどのプロダクションワークロードのオーケストレーションを完全に処理できるようになりました。
 # MAGIC
-# MAGIC # Orchestrating Jobs with Databricks Workflows
+# MAGIC ここでは、ノートブックタスクをトリガーとしてスタンドアロンのジョブとしてスケジュールする手順を説明し、次にDLTパイプラインを使用して依存タスクを追加します。
 # MAGIC
-# MAGIC New updates to the Databricks Jobs UI have added the ability to schedule multiple tasks as part of a job, allowing Databricks Jobs to fully handle orchestration for most production workloads.
-# MAGIC
-# MAGIC Here, we'll start by reviewing the steps for scheduling a notebook task as a triggered standalone job, and then add a dependent task using a DLT pipeline. 
-# MAGIC
-# MAGIC ## Learning Objectives
-# MAGIC By the end of this lesson, you should be able to:
-# MAGIC * Schedule a notebook task in a Databricks Workflow Job
-# MAGIC * Describe job scheduling options and differences between cluster types
-# MAGIC * Review Job Runs to track progress and see results
-# MAGIC * Schedule a DLT pipeline task in a Databricks Workflow Job
-# MAGIC * Configure linear dependencies between tasks using the Databricks Workflows UI
+# MAGIC ## 学習目標
+# MAGIC このレッスンの終わりまでに、次のことができるようになるはずです：
+# MAGIC * Databricks Workflowジョブでノートブックタスクをスケジュールする
+# MAGIC * ジョブのスケジュールオプションとクラスタータイプの違いを説明する
+# MAGIC * ジョブの実行を確認して進捗状況と結果を確認する
+# MAGIC * Databricks WorkflowジョブでDLTパイプラインタスクをスケジュールする
+# MAGIC * Databricks Workflows UIを使用してタスク間の線形な依存関係を設定する
 
 # COMMAND ----------
 
@@ -34,11 +32,11 @@
 # DBTITLE 0,--i18n-fb1b72e2-458f-4930-b070-7d60a4d3b34f
 # MAGIC %md
 # MAGIC
-# MAGIC ## Generate Job Configuration
+# MAGIC ## ジョブの設定を生成
 # MAGIC
-# MAGIC Configuring this job will require parameters unique to a given user.
+# MAGIC このジョブの設定には、各ユーザー固有のパラメータが必要です。
 # MAGIC
-# MAGIC Run the cell below to print out values you'll use to configure your pipeline in subsequent steps.
+# MAGIC 以下のセルを実行して、後続の手順でパイプラインを設定するために使用する値を表示します。
 
 # COMMAND ----------
 
@@ -49,29 +47,29 @@ DA.print_job_config_v1()
 # DBTITLE 0,--i18n-b3634ee0-e06e-42ca-9e70-a9a02410f705
 # MAGIC %md
 # MAGIC
-# MAGIC ## Configure Job with a Single Notebook Task
+# MAGIC ## 単一のノートブックタスクを持つジョブを設定
 # MAGIC
-# MAGIC When using the Jobs UI to orchestrate a workload with multiple tasks, you'll always begin by creating a job with a single task.
+# MAGIC Jobs UIを使用して複数のタスクを持つワークロードをオーケストレーションする場合、常に単一のタスクを持つジョブを作成してから始めます。
 # MAGIC
-# MAGIC Steps:
-# MAGIC 1. Click the **Workflows** button on the sidebar, click the **Jobs** tab, and click the **Create Job** button.
-# MAGIC 2. Configure the job and task as specified below. You'll need the values provided in the cell output above for this step.
+# MAGIC 手順:
+# MAGIC 1. サイドバーの「ワークフロー」ボタンをクリックし、「ジョブ」タブをクリックし、「ジョブの作成」ボタンをクリックします。
+# MAGIC 2. 指定されたジョブとタスクを設定します。この手順には、上記のセルから提供された値が必要です。
 # MAGIC
-# MAGIC | Setting | Instructions |
+# MAGIC | 設定 | 指示 |
 # MAGIC |--|--|
-# MAGIC | Task name | Enter **Reset** |
-# MAGIC | Type | Choose **Notebook** |
-# MAGIC | Source | Choose **Workspace** |
-# MAGIC | Path | Use the navigator to specify the **Reset Notebook Path** provided above |
-# MAGIC | Cluster | From the dropdown menu, under **Existing All Purpose Clusters**, select your cluster |
-# MAGIC | Job name | In the top-left of the screen, enter the **Job Name** provided above to add a name for the job (not the task) |
+# MAGIC | タスク名 | **リセット** を入力してください |
+# MAGIC | タイプ | **ノートブック** を選択してください |
+# MAGIC | ソース | **ワークスペース** を選択してください |
+# MAGIC | パス | ナビゲータを使用して、上記で提供された **リセットノートブックパス** を指定します |
+# MAGIC | クラスタ | ドロップダウンメニューから、**既存の汎用クラスタ** の下で、クラスタを選択します |
+# MAGIC | ジョブ名 | 画面の左上に、ジョブ（タスクではなく）の名前を追加するために、上記で提供された **ジョブ名** を入力します |
 # MAGIC
 # MAGIC <br>
 # MAGIC
-# MAGIC 3. Click the **Create** button.
-# MAGIC 4. Click the blue **Run now** button in the top right to start the job.
+# MAGIC 3. 「作成」ボタンをクリックします。
+# MAGIC 4. 右上の青い **今すぐ実行** ボタンをクリックしてジョブを開始します。
 # MAGIC
-# MAGIC <img src="https://files.training.databricks.com/images/icon_note_24.png"> **Note**: When selecting your all-purpose cluster, you will get a warning about how this will be billed as all-purpose compute. Production jobs should always be scheduled against new job clusters appropriately sized for the workload, as this is billed at a much lower rate.
+# MAGIC <img src="https://files.training.databricks.com/images/icon_note_24.png"> **注意**: オールパーパスクラスタを選択する際に、これがオールパーパスコンピュートとして請求されることに関する警告が表示されます。本番のジョブは、ワークロードに適切なサイズの新しいジョブクラスタに対してスケジュールされるべきです。これははるかに低い料金で請求されるためです。
 
 # COMMAND ----------
 
@@ -82,45 +80,43 @@ DA.validate_job_v1_config()
 # DBTITLE 0,--i18n-eb8d7811-b356-41d2-ae82-e3762add19f7
 # MAGIC %md
 # MAGIC
-# MAGIC
-# MAGIC ## Explore Scheduling Options
-# MAGIC Steps:
-# MAGIC 1. On the right hand side of the Jobs UI, locate the **Job Details** section.
-# MAGIC 1. Under the **Trigger** section, select the **Add trigger** button to explore scheduling options.
-# MAGIC 1. Changing the **Trigger type** from **None (Manual)** to **Scheduled** will bring up a cron scheduling UI.
-# MAGIC    - This UI provides extensive options for setting up chronological scheduling of your Jobs. Settings configured with the UI can also be output in cron syntax, which can be edited if custom configuration not available with the UI is needed.
-# MAGIC 1. At this time, we'll leave our job set to **Manual** scheduling; select **Cancel** to return to Job details.
+# MAGIC ## スケジューリングオプションを探る
+# MAGIC 手順:
+# MAGIC 1. Jobs UIの右側にある **Job Details** セクションを見つけます。
+# MAGIC 1. **Trigger** セクションの下で、**Add trigger** ボタンを選択してスケジュールオプションを探します。
+# MAGIC 1. **Trigger type** を **None (Manual)** から **Scheduled** に変更すると、cronスケジューリングUIが表示されます。
+# MAGIC    - このUIでは、ジョブの年表スケジュール設定のための幅広いオプションを提供します。UIで設定した設定は、cron構文で出力することもでき、UIで利用できないカスタム構成が必要な場合は編集できます。
+# MAGIC 1. この時点では、ジョブを **Manual** スケジュールに設定したままにしておきます。ジョブの詳細に戻るには、**キャンセル** を選択します。
 
 # COMMAND ----------
 
 # DBTITLE 0,--i18n-eb585218-f5df-43f8-806f-c80d6783df16
 # MAGIC %md
 # MAGIC
+# MAGIC ## 実行を確認する
 # MAGIC
-# MAGIC ## Review Run
-# MAGIC
-# MAGIC To review the job run:
-# MAGIC 1. On the Jobs details page, select the **Runs** tab in the top-left of the screen (you should currently be on the **Tasks** tab)
-# MAGIC 1. Find your job.
-# MAGIC     - If **the job is still running**, it will be under the **Active runs** section. 
-# MAGIC     - If **the job finished running**, it will be under the **Completed runs** section
-# MAGIC 1. Open the output details by clicking on the timestamp field under the **Start time** column
-# MAGIC     - If **the job is still running**, you will see the active state of the notebook with a **Status** of **`Pending`** or **`Running`** in the right side panel. 
-# MAGIC     - If **the job has completed**, you will see the full execution of the notebook with a **Status** of **`Succeeded`** or **`Failed`** in the right side panel
+# MAGIC ジョブの実行を確認するには次の手順を実行します。
+# MAGIC 1. Jobsの詳細ページで、画面の左上にある**Runs**タブを選択します（現在は**Tasks**タブになっているはずです）。
+# MAGIC 1. ジョブを見つけます。
+# MAGIC     - ジョブが**実行中の場合**、**Active runs**セクションの下に表示されます。
+# MAGIC     - ジョブが**実行が終了した場合**、**Completed runs**セクションの下に表示されます。
+# MAGIC 1. **Start time**列のタイムスタンプフィールドをクリックして、出力の詳細を開きます。
+# MAGIC     - ジョブが**実行中の場合**、右側のパネルに**Status**が**`Pending`**または**`Running`**で表示されるため、ノートブックの実行状態が表示されます。
+# MAGIC     - ジョブが**完了した場合**、右側のパネルに**Status**が**`Succeeded`**または**`Failed`**で表示されるため、ノートブックの実行内容が表示されます。
 # MAGIC   
-# MAGIC The notebook employs the magic command **`%run`** to call an additional notebook using a relative path. Note that while not covered in this course, <a href="https://docs.databricks.com/repos.html#work-with-non-notebook-files-in-a-databricks-repo" target="_blank">new functionality added to Databricks Repos allows loading Python modules using relative paths</a>.
+# MAGIC このノートブックは、相対パスを使用して別のノートブックを呼び出すためにマジックコマンド **`%run`** を使用しています。このコースではカバーしていませんが、<a href="https://docs.databricks.com/repos.html#work-with-non-notebook-files-in-a-databricks-repo" target="_blank">Databricks Reposに追加された新機能を使用すると、相対パスを使用してPythonモジュールをロードできます</a>。
 # MAGIC
-# MAGIC The actual outcome of the scheduled notebook is to reset the environment for our new job and pipeline.
+# MAGIC スケジュールされたノートブックの実際の結果は、新しいジョブとパイプラインのために環境をリセットすることです。
 
 # COMMAND ----------
 
 # DBTITLE 0,--i18n-bc61c131-7d68-4633-afd7-609983e43e17
 # MAGIC %md
-# MAGIC ## Generate Pipeline
+# MAGIC ## パイプラインの生成
 # MAGIC
-# MAGIC In this step, we'll add a DLT pipeline to execute after the success of the task we configured at the start of this lesson.
+# MAGIC このステップでは、このレッスンの最初に構成したタスクの成功後に実行するためのDLTパイプラインを追加します。
 # MAGIC
-# MAGIC To focus on jobs and not pipelines, we are going to use the following utility command to create a simple pipeline for us.
+# MAGIC ジョブに焦点を当て、パイプラインではなくジョブを実行するため、以下のユーティリティコマンドを使用して簡単なパイプラインを作成します。
 
 # COMMAND ----------
 
@@ -131,33 +127,33 @@ DA.create_pipeline()
 # DBTITLE 0,--i18n-19e4daea-c893-4871-8937-837970dc7c9b
 # MAGIC %md
 # MAGIC
-# MAGIC ## Configure a DLT Pipeline Task
+# MAGIC ## DLTパイプラインタスクの構成
 # MAGIC
-# MAGIC Next, we need to add the task to run this pipeline.
+# MAGIC 次に、このパイプラインを実行するためのタスクを追加する必要があります。
 # MAGIC
-# MAGIC Steps:
-# MAGIC 1. On the Job details page, click the **Tasks** tab.
-# MAGIC 1. Click the large blue circle with a **+** at the center bottom of the screen to add a new task
-# MAGIC 1. Configure the task as specified below.
+# MAGIC 手順：
+# MAGIC 1. ジョブの詳細ページで、**Tasks**タブをクリックします。
+# MAGIC 1. 画面の中央下部にある中央に青い円形の**+**をクリックして新しいタスクを追加します。
+# MAGIC 1. 次に示すようにタスクを構成します。
 # MAGIC
-# MAGIC | Setting | Instructions |
+# MAGIC | 設定 | 指示 |
 # MAGIC |--|--|
-# MAGIC | Task name | Enter **DLT** |
-# MAGIC | Type | Choose **Delta Live Tables pipeline** |
-# MAGIC | Pipeline | Choose the DLT pipeline configured above |
-# MAGIC | Depends on | Choose **Reset**, which is the previous task we defined |
+# MAGIC | タスク名 | **DLT**を入力します |
+# MAGIC | タイプ | **Delta Live Tables pipeline**を選択します |
+# MAGIC | パイプライン | 上記で構成したDLTパイプラインを選択します |
+# MAGIC | 依存タスク | 前に定義した**Reset**を選択します |
 # MAGIC
 # MAGIC <br>
 # MAGIC
-# MAGIC 4. Click the blue **Create task** button
-# MAGIC     - You should now see a screen with 2 boxes and a downward arrow between them. 
-# MAGIC     - Your **`Reset`** task will be at the top, leading into your **`DLT`** task. 
-# MAGIC     - This visualization represents the dependencies between these tasks.
-# MAGIC 5. Validate the configuration by running the command below.
-# MAGIC     - If errors are reported, repeat the following until all errors have been removed.
-# MAGIC       - Fix the error(s).
-# MAGIC       - Click the **Create task** button.
-# MAGIC       - Validate the configuration.
+# MAGIC 4. 青い**Create task**ボタンをクリックします
+# MAGIC     - これで、2つのボックスとそれらの間にある下向きの矢印を持つ画面が表示されるはずです。
+# MAGIC     - **`Reset`** タスクは上部にあり、 **`DLT`** タスクにつながっています。
+# MAGIC     - この可視化は、これらのタスク間の依存関係を表しています。
+# MAGIC 5. 下記のコマンドを実行して構成を検証します。
+# MAGIC     - エラーが報告された場合、次の手順を繰り返してすべてのエラーを削除してください。
+# MAGIC       - エラー（複数の場合はすべてのエラー）を修正します。
+# MAGIC       - **Create task**ボタンをクリックします。
+# MAGIC       - 構成を検証します。
 
 # COMMAND ----------
 
@@ -168,28 +164,27 @@ DA.validate_job_v2_config()
 # DBTITLE 0,--i18n-1c949168-e917-455d-8a54-2768592a16f1
 # MAGIC %md
 # MAGIC
-# MAGIC ## Run the job
-# MAGIC Once the job has been properly configured, click the blue **Run now** button in the top right to start the job.
-# MAGIC <img src="https://files.training.databricks.com/images/icon_note_24.png"> **Note**: When selecting your all-purpose cluster, you will get a warning about how this will be billed as all-purpose compute. Production jobs should always be scheduled against new job clusters appropriately sized for the workload, as this is billed at a much lower rate.
+# MAGIC ## ジョブを実行する
+# MAGIC ジョブが正しく構成されたら、ジョブを開始するために右上の青い**Run now**ボタンをクリックします。
+# MAGIC <img src="https://files.training.databricks.com/images/icon_note_24.png"> **注意**: すべての用途のクラスタを選択すると、すべての目的の計算として請求される警告が表示されます。本番のジョブは常に、ワークロードに適切なサイズの新しいジョブクラスタに対してスケジュールする必要があります。これにより、低料金で請求されます。
 # MAGIC
-# MAGIC **NOTE**: You may need to wait a few minutes as infrastructure for your job and pipeline is deployed.
+# MAGIC **注意**: ジョブおよびパイプラインのインフラストラクチャの展開に数分待つ必要がある場合があります。
 
 # COMMAND ----------
 
 # DBTITLE 0,--i18n-666a45d2-1a19-45ba-b771-b47456e6f7e4
 # MAGIC %md
 # MAGIC
+# MAGIC ## マルチタスク実行結果の確認
 # MAGIC
-# MAGIC ## Review Multi-Task Run Results
+# MAGIC 実行結果を確認するには、次の手順を実行します。
+# MAGIC 1. ジョブ詳細ページで、**Runs**タブを再度選択し、最新の実行を**Active runs**または**Completed runs**の下で選択します。ジョブが完了しているかどうかに応じて異なります。
+# MAGIC     - タスクの可視化はリアルタイムで更新され、実行中のタスクがどれかを示し、タスクの失敗が発生すると色が変わります。
+# MAGIC 1. タスクボックスをクリックすると、UIでスケジュールされたノートブックが表示されます。
+# MAGIC     - これは、前のDatabricks Jobs UIの上に追加のオーケストレーションのレイヤーと考えることができます。
+# MAGIC     - ジョブをCLIまたはREST APIを使用してスケジュールしている場合、[ジョブを構成および結果を取得するためのJSON構造](https://docs.databricks.com/dev-tools/api/latest/jobs.html)はUIと同様の更新を受けています。
 # MAGIC
-# MAGIC To review run results:
-# MAGIC 1. On the Job details page, select the **Runs** tab again and then the most recent run under **Active runs** or **Completed runs** depending on if the job has completed or not.
-# MAGIC     - The visualizations for tasks will update in real time to reflect which tasks are actively running, and will change colors if task failures occur. 
-# MAGIC 1. Clicking on a task box will render the scheduled notebook in the UI. 
-# MAGIC     - You can think of this as just an additional layer of orchestration on top of the previous Databricks Jobs UI, if that helps;
-# MAGIC     - Note that if you have workloads scheduling jobs with the CLI or REST API, <a href="https://docs.databricks.com/dev-tools/api/latest/jobs.html" target="_blank">the JSON structure used to configure and get results about jobs has seen similar updates to the UI</a>.
-# MAGIC
-# MAGIC **NOTE**: At this time, DLT pipelines scheduled as tasks do not directly render results in the Runs GUI; instead, you will be directed back to the DLT Pipeline GUI for the scheduled Pipeline.
+# MAGIC **注意**: 現時点では、タスクとしてスケジュールされたDLTパイプラインは、実行のGUIで直接結果を表示しません。代わりに、スケジュールされたパイプラインのためにDLTパイプラインGUIに戻されます。
 
 # COMMAND ----------
 
