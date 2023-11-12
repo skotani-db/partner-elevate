@@ -105,6 +105,24 @@ ON a.order_id = b.order_id;
 
 -- COMMAND ----------
 
+-- -- ANSWER
+-- CREATE OR REFRESH STREAMING LIVE TABLE status_bronze
+-- AS SELECT current_timestamp() processing_time, input_file_name() source_file, *
+-- FROM cloud_files("${source}/status", "json");
+
+-- CREATE OR REFRESH STREAMING LIVE TABLE status_silver
+-- (CONSTRAINT valid_timestamp EXPECT (status_timestamp > 1640995200) ON VIOLATION DROP ROW)
+-- AS SELECT * EXCEPT (source_file, _rescued_data)
+-- FROM STREAM(LIVE.status_bronze);
+
+-- CREATE OR REFRESH LIVE TABLE email_updates
+-- AS SELECT a.*, b.email
+-- FROM LIVE.status_silver a
+-- INNER JOIN LIVE.subscribed_order_emails_v b
+-- ON a.order_id = b.order_id;
+
+-- COMMAND ----------
+
 -- MAGIC %md-sandbox
 -- MAGIC &copy; 2023 Databricks, Inc. All rights reserved.<br/>
 -- MAGIC Apache, Apache Spark, Spark and the Spark logo are trademarks of the <a href="https://www.apache.org/">Apache Software Foundation</a>.<br/>
